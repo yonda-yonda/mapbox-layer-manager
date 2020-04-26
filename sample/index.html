@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mapbox Layer Manager</title>
+
+    <script src='https://api.mapbox.com/mapbox-gl-js/v1.9.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v1.9.1/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        #map {
+            height: 600px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+</body>
+<script src='../dist/mapbox-layer-manager.js'></script>
+<script>
+    const map = new mapboxgl.Map({
+        container: "map",
+        center: [139.765, 35.65],
+        zoom: 10,
+        minZoom: 0,
+        maxZoom: 18
+    });
+
+    const manager = new MapboxLayerManager(map);
+
+    manager.addGroup({
+        id: 'base',
+        type: 'single'
+    }, {
+        fixedTo: 'underlay'
+    });
+    manager.addGroup({
+        id: 'group1'
+    });
+    manager.addGroup({
+        id: 'group3'
+    });
+    manager.addGroup({
+        id: 'group4'
+    });
+    manager.addGroup({
+        id: 'group2'
+    }, {
+        beforeId: 'group4'
+    });
+    manager.addGroup({
+        id: 'group2/group1'
+    });
+
+    manager.addSource('base/tile_pale', {
+        type: "raster",
+        tiles: [
+            "https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png"
+        ],
+        attribution: "<a href='http: //maps.gsi.go.jp/development/ichiran.html'>地理院タイル</a>",
+        tileSize: 256,
+        minzoom: 5,
+        maxzoom: 18
+    });
+    manager.addLayer({
+        "id": "base/pale",
+        "type": "raster",
+        "source": "base/tile_pale",
+        'layout': {
+            'visibility': 'visible'
+        }
+    });
+    manager.addLayer({
+        "id": "base/photo",
+        "type": "raster",
+        "source": {
+            "type": "raster",
+            "tiles": [
+                "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg"
+            ],
+            "attribution": "<a href='http: //maps.gsi.go.jp/development/ichiran.html'>地理院タイル</a>",
+            "tileSize": 256,
+            minzoom: 14,
+            maxzoom: 18
+        },
+        'layout': {
+            'visibility': 'visible'
+        }
+    });
+    manager.addLayer({
+        "id": "base/std",
+        "type": "raster",
+        "source": {
+            "type": "raster",
+            "tiles": [
+                "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png"
+            ],
+            "attribution": "<a href='http: //maps.gsi.go.jp/development/ichiran.html'>地理院タイル</a>",
+            "tileSize": 256,
+            minzoom: 5,
+            maxzoom: 18
+        },
+        'layout': {
+            'visibility': 'visible'
+        }
+    });
+
+    manager.addLayer({
+        "id": "image4",
+        "type": "raster",
+        "source": {
+            "type": "image",
+            "url": "./4.png",
+            "coordinates": [
+                [139.7900390625, 35.63944106897394],
+                [139.8779296875, 35.63944106897394],
+                [139.8779296875, 35.56798045801208],
+                [139.7900390625, 35.56798045801208]
+            ]
+        },
+        'layout': {
+            'visibility': 'visible'
+        }
+    }, {
+        beforeId: 'group1'
+    });
+
+    manager.addLayer({
+        "id": "group1/image1",
+        "type": "raster",
+        "source": {
+            "type": "image",
+            "url": "./1.png",
+            "coordinates": [
+                [139.74609375, 35.67514743608467],
+                [139.833984375, 35.67514743608467],
+                [139.833984375, 35.6037187406973],
+                [139.74609375, 35.6037187406973]
+            ]
+        },
+        'layout': {
+            'visibility': 'visible'
+        }
+    });
+
+    manager.addLayer({
+        "id": "image2",
+        "type": "raster",
+        "source": {
+            "type": "image",
+            "url": "./2.png",
+            "coordinates": [
+                [139.7900390625, 35.67514743608467],
+                [139.8779296875, 35.67514743608467],
+                [139.8779296875, 35.6037187406973],
+                [139.7900390625, 35.6037187406973]
+            ]
+        }
+    }, {
+        beforeId: 'group2'
+    });
+
+    manager.addLayer({
+        "id": "image3",
+        "type": "raster",
+        "source": {
+            "type": "image",
+            "url": "./3.png",
+            "coordinates": [
+                [139.74609375, 35.63944106897394],
+                [139.833984375, 35.63944106897394],
+                [139.833984375, 35.56798045801208],
+                [139.74609375, 35.56798045801208]
+            ]
+        },
+        'layout': {
+            'visibility': 'visible'
+        }
+    }, {
+        beforeId: 'group2'
+    });
+
+    manager.addLayer({
+        "id": "group2/image5",
+        "type": "raster",
+        "source": {
+            "type": "image",
+            "url": "./5.png",
+            "coordinates": [
+                [139.74609375, 35.6037187406973],
+                [139.833984375, 35.6037187406973],
+                [139.833984375, 35.532226227703376],
+                [139.74609375, 35.532226227703376]
+            ]
+        },
+        'layout': {
+            'visibility': 'visible'
+        }
+    }, {
+        beforeId: 'group2/group1'
+    });
+
+    manager.addLayer({
+        "id": "group2/group1/image6",
+        "type": "raster",
+        "source": {
+            "type": "image",
+            "url": "./6.png",
+            "coordinates": [
+                [139.74609375, 35.5679724842],
+                [139.790039063, 35.5679724842],
+                [139.790039063, 35.532226227703376],
+                [139.74609375, 35.532226227703376]
+            ]
+        },
+        'layout': {
+            'visibility': 'visible'
+        }
+    });
+
+    manager.addLayer({
+        "id": "group2/image7",
+        "type": "raster",
+        "source": {
+            "type": "image",
+            "url": "./7.png",
+            "coordinates": [
+                [139.7021484375, 35.71083783530008],
+                [139.7900390625, 35.71083783530008],
+                [139.7900390625, 35.63944106897394],
+                [139.7021484375, 35.63944106897394]
+            ]
+        },
+        'layout': {
+            'visibility': 'visible'
+        }
+    });
+
+    manager.addLayer({
+        "id": "image8",
+        "type": "raster",
+        "source": {
+            "type": "image",
+            "url": "./8.png",
+            "coordinates": [
+                [139.7021484375, 35.71083783530008],
+                [139.74609375, 35.71083783530008],
+                [139.74609375, 35.6751394521],
+                [139.7021484375, 35.6751394521]
+            ]
+        },
+        'layout': {
+            'visibility': 'visible'
+        }
+    });
+
+    manager.addSource('group4/shape1', {
+        type: 'geojson',
+        data: './shape.geojson'
+    });
+
+    manager.addLayer({
+        'id': 'group4/shape1-polygon',
+        'type': 'fill',
+        'source': 'group4/shape1',
+        'paint': {
+            'fill-color': [
+                "get", "fillColor"
+            ],
+            'fill-opacity': [
+                "get", "fillOpacity"
+            ]
+        },
+        'filter': ['==', 'drawtype', 'polygon']
+    });
+
+    manager.addLayer({
+        'id': 'group4/shape1-point',
+        'type': 'circle',
+        'source': 'group4/shape1',
+        'paint': {
+            'circle-radius': {
+                stops: [
+                    [0, 1],
+                    [16, 120]
+                ]
+            },
+            'circle-color': [
+                "get", "fillColor"
+            ],
+            'circle-opacity': [
+                "get", "fillOpacity"
+            ]
+        },
+        'filter': ['==', 'drawtype', 'circle'],
+    });
+
+    manager.addLayer({
+        'id': 'group4/shape1-line',
+        'type': 'line',
+        'source': 'group4/shape1',
+        'layout': {
+            'line-join': 'round',
+            'line-cap': 'round'
+        },
+        'paint': {
+            'line-color': [
+                "get", "color"
+            ],
+            'line-width': [
+                "get", "weight"
+            ],
+            'line-opacity': [
+                "get", "opacity"
+            ]
+        },
+        'filter': ['==', 'drawtype', 'polyline']
+    });
+
+    manager.addLayer({
+        "id": "group4/image9",
+        "type": "raster",
+        "source": {
+            "type": "image",
+            "url": "./9.png",
+            "coordinates": [
+                [139.614257813, 35.71083783530008],
+                [139.7021484375, 35.71083783530008],
+                [139.7021484375, 35.63944106897394],
+                [139.614257813, 35.63944106897394]
+            ]
+        },
+        'layout': {
+            'visibility': 'visible'
+        }
+    });
+
+    manager.move('group1', 'group3');
+    manager.move('group2/image5');
+</script>
+
+</html>
