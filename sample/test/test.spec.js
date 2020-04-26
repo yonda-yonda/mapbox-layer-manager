@@ -942,12 +942,7 @@ describe('layer type', () => {
 			'type': 'circle',
 			'source': 'shape',
 			'paint': {
-				'circle-radius': {
-					stops: [
-						[0, 1],
-						[16, 120]
-					]
-				},
+				'circle-radius': 10,
 				'circle-color': [
 					"get", "fillColor"
 				],
