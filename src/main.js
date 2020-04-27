@@ -1,4 +1,4 @@
-import extend from 'jquery-extend';
+import $ from 'jquery';
 import {
 	version
 } from '../package.json';
@@ -127,7 +127,7 @@ class LyrGrp {
 
 
 	_show(id, root, options = {}) {
-		options = extend(true, {
+		options = $.extend(true, {
 			force: false,
 			onVisiblePath: true,
 		}, options);
@@ -150,7 +150,7 @@ class LyrGrp {
 	}
 
 	_hide(id, root, options = {}) {
-		options = extend(true, {
+		options = $.extend(true, {
 			force: false
 		}, options);
 		const force = options.force;
@@ -171,12 +171,12 @@ class LyrGrp {
 	}
 
 	_addGroup(layerConfig, options = {}) {
-		layerConfig = extend(true, {
+		layerConfig = $.extend(true, {
 			type: 'multi',
 			visible: true,
 		}, layerConfig);
 
-		options = extend(true, {
+		options = $.extend(true, {
 			fixedTo: '',
 			beforeId: undefined
 		}, options);
@@ -255,7 +255,7 @@ class LyrGrp {
 	}
 
 	_addLayer(layerConfig, options = {}) {
-		options = extend(true, {
+		options = $.extend(true, {
 			fixedTo: '',
 			beforeId: undefined,
 			onVisiblePath: true
@@ -271,7 +271,7 @@ class LyrGrp {
 		if (getIndexByKey(this._lyrs, '_id', id) >= 0) throw new Error(`${id} already exists on this manager.`);
 
 		if (typeof layerConfig.layout === 'undefined' || typeof layerConfig.layout.visibility === 'undefined')
-			layerConfig = extend(true, {
+			layerConfig = $.extend(true, {
 				layout: {
 					visibility: 'visible'
 				}
@@ -340,7 +340,7 @@ class LyrGrp {
 
 class MultiLyrGrp extends LyrGrp {
 	constructor(map, id, parent, options = {}) {
-		options = extend(true, {
+		options = $.extend(true, {
 			visible: true
 		}, options);
 		super(map, id, parent)
@@ -351,7 +351,7 @@ class MultiLyrGrp extends LyrGrp {
 
 class SwitchLyrGrp extends LyrGrp {
 	constructor(map, id, parent, options = {}) {
-		options = extend(true, {
+		options = $.extend(true, {
 			visible: true
 		}, options);
 		super(map, id, parent)
@@ -491,7 +491,7 @@ class MapboxLayerManager extends LyrGrp {
 		const parent = this._getById(parentPath);
 		if (typeof parent === 'undefined') throw new Error('not found parent layer group.');
 
-		parent._addLayer(layerConfig, extend(true, options, {
+		parent._addLayer(layerConfig, $.extend(true, options, {
 			onVisiblePath: this._onVisiblePath(parent),
 			parentNextLayerId: this._getParentNextLayerId(parent)
 		}));
@@ -506,21 +506,21 @@ class MapboxLayerManager extends LyrGrp {
 	}
 
 	show(id, options = {}) {
-		options = extend(true, {
+		options = $.extend(true, {
 			force: false
 		}, options);
 		const parentPath = getParentPath(id);
 		const parent = this._getById(parentPath);
 
 		if (parent) {
-			parent._show(id, true, extend(true, options, {
+			parent._show(id, true, $.extend(true, options, {
 				onVisiblePath: this._onVisiblePath(parent)
 			}));
 		}
 	}
 
 	hide(id, options = {}) {
-		options = extend(true, {
+		options = $.extend(true, {
 			force: false
 		}, options);
 		const parentPath = getParentPath(id);
@@ -611,7 +611,7 @@ class MapboxLayerManager extends LyrGrp {
 	}
 
 	getLayerIds(options = {}) {
-		options = extend(true, {
+		options = $.extend(true, {
 			id: '',
 			visiblity: 'any'
 		}, options);
