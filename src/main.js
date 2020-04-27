@@ -230,7 +230,7 @@ class LyrGrp {
 
 	_removeGroup(groupId) {
 		const grplyr = this._lyrs[getIndexByKey(this._lyrs, '_id', groupId)];
-		if (!grplyr instanceof LyrGrp) throw new Error(`${groupId} does not exist on this manager.`);
+		if (!(grplyr instanceof LyrGrp)) throw new Error(`${groupId} does not exist on this manager.`);
 
 		if (groupId === this._overlayId) {
 			this._overlayId = '';
@@ -325,7 +325,7 @@ class LyrGrp {
 
 	_removeLayer(id) {
 		const lyr = this._lyrs[getIndexByKey(this._lyrs, '_id', id)];
-		if (!lyr instanceof Lyr) throw new Error('This id is not layer.');
+		if (!(lyr instanceof Lyr)) throw new Error('This id is not layer.');
 
 		if (id === this._overlayId) {
 			this._overlayId = '';
