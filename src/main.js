@@ -365,8 +365,8 @@ class SwitchLyrGrp extends LyrGrp {
 			this._selectId = id;
 			super._show(id, root, options);
 			this._lyrs.forEach((lyr) => {
-				if (lyr.id !== id)
-					this._hide(lyr.id, true)
+				if (lyr._id !== id)
+					this._hide(lyr._id, true)
 
 			})
 		} else {
