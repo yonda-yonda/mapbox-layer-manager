@@ -35,7 +35,7 @@ const getIds = (mamnager, type = 'all', visibility = 'any') => {
 			ids.push({
 				id: lyr._id,
 				visible: lyr._visible,
-				type: (lyr._type === 'multi' || lyr._type === 'switch') ? 'group' : 'layer'
+				type: (lyr._type === 'multi' || lyr._type === 'single') ? 'group' : 'layer'
 			});
 			if (Array.isArray(lyr._lyrs)) {
 				ids = ids.concat(_getIds(lyr._lyrs))
@@ -212,13 +212,13 @@ describe('add/remove', () => {
 		manager.addGroup({
 			id: id3,
 			visible: true,
-			type: 'switch'
+			type: 'single'
 		}, {
 			beforeId: id1
 		});
 		const grp3 = manager._lyrs[0];
 		chai.assert.strictEqual(grp3._id, id3)
-		chai.assert.strictEqual(grp3._type, 'switch')
+		chai.assert.strictEqual(grp3._type, 'single')
 		chai.assert.strictEqual(grp3._parent, manager)
 		chai.assert.strictEqual(grp3._visible, true)
 
@@ -328,7 +328,7 @@ describe('add/remove', () => {
 		const groupId3 = groupId2 + '/group3'
 		manager.addGroup({
 			id: groupId3,
-			type: 'switch'
+			type: 'single'
 		}, {
 			beforeId: layerConfig3.id
 		});
@@ -337,7 +337,7 @@ describe('add/remove', () => {
 		const groupId4 = groupId3 + '/group4'
 		manager.addGroup({
 			id: groupId4,
-			type: 'switch'
+			type: 'single'
 		}, {
 			fixedTo: 'overlay'
 		});
@@ -347,7 +347,7 @@ describe('add/remove', () => {
 		// group4/image5 property
 		const grp4 = manager._lyrs[1]._lyrs[1]._lyrs[1];
 		chai.assert.strictEqual(grp4._id, groupId4)
-		chai.assert.strictEqual(grp4._type, 'switch')
+		chai.assert.strictEqual(grp4._type, 'single')
 		chai.assert.strictEqual(grp4._parent, manager._lyrs[1]._lyrs[1])
 		chai.assert.strictEqual(grp4._visible, true)
 		const lyr5 = grp4._lyrs[0];
@@ -361,7 +361,7 @@ describe('add/remove', () => {
 		manager.addLayer(layerConfig6, {
 			fixedTo: 'overlay'
 		});
-		// changed by switch group
+		// changed by single group
 		chai.assert.strictEqual(grp4._visible, false) // changed
 		chai.assert.strictEqual(lyr5._visible, isVisibleConfig(layerConfig5)) // not changed
 
@@ -370,7 +370,7 @@ describe('add/remove', () => {
 		manager.addGroup({
 			id: groupId5,
 			visible: false,
-			type: 'switch'
+			type: 'single'
 		});
 		const layerConfig8 = dummyImageLayerConfig(groupId5 + '/image8', 'none');
 		manager.addLayer(layerConfig8, {
@@ -493,7 +493,7 @@ describe('add/remove', () => {
 		const groupId3 = groupId2 + '/group3'
 		manager.addGroup({
 			id: groupId3,
-			type: 'switch'
+			type: 'single'
 		}, {
 			beforeId: layerConfig2.id
 		});
@@ -521,7 +521,7 @@ describe('add/remove', () => {
 		const groupId6 = groupId5 + '/group6'
 		manager.addGroup({
 			id: groupId6,
-			type: 'switch'
+			type: 'single'
 		});
 		const layerConfig9 = dummyImageLayerConfig(groupId6 + '/image9', 'visible');
 		manager.addLayer(layerConfig9);
@@ -602,7 +602,7 @@ describe('change order', () => {
 		const groupId3 = groupId2 + '/group3'
 		manager.addGroup({
 			id: groupId3,
-			type: 'switch'
+			type: 'single'
 		}, {
 			beforeId: layerConfig2.id
 		});
@@ -702,7 +702,7 @@ describe('change visiblity', () => {
 		const groupId3 = groupId2 + '/group3'
 		manager.addGroup({
 			id: groupId3,
-			type: 'switch'
+			type: 'single'
 		}, {
 			beforeId: layerConfig2.id
 		});

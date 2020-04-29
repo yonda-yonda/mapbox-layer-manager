@@ -109,7 +109,7 @@ const getOpacityPropertyNames = (type) => {
 }
 
 class Lyr {
-	constructor(id, parent) {
+	constructor(id, parent, options = {}) {
 		this._id = id;
 		this._parent = parent;
 		this._type = options.type;
@@ -221,8 +221,8 @@ class LyrGrp {
 		}
 
 		let group
-		if (groupType === 'switch') {
-			group = new SwitchLyrGrp(this._map, groupId, this, {
+		if (groupType === 'single') {
+			group = new SingleLyrGrp(this._map, groupId, this, {
 				visible,
 				separator: this._separator
 			})
@@ -356,13 +356,13 @@ class MultiLyrGrp extends LyrGrp {
 	}
 }
 
-class SwitchLyrGrp extends LyrGrp {
+class SingleLyrGrp extends LyrGrp {
 	constructor(map, id, parent, options = {}) {
 		options = $.extend(true, {
 			visible: true
 		}, options);
 		super(map, id, parent, options)
-		this._type = 'switch'
+		this._type = 'single'
 		this._visible = options.visible;
 		this._selectId = ''
 	}
@@ -429,8 +429,8 @@ class MapboxLayerManager extends LyrGrp {
 		if (id === "") return this;
 
 		const _get = (parent, path, stage) => {
-			const chained = path.split(options.separator);
-			const id = chained.slice(0, stage + 1).join(options.separator)
+			const chained = path.split(this._separator);
+			const id = chained.slice(0, stage + 1).join(this._separator)
 			const index = getIndexByKey(parent._lyrs, '_id', id);
 			if (index >= 0) {
 				const lyr = parent._lyrs[index];
@@ -487,7 +487,7 @@ class MapboxLayerManager extends LyrGrp {
 		parent._removeGroup(grplyr._id);
 	}
 
-	addLayer(layerConfig, options) {
+	addLayer(layerConfig, options = {}) {
 		const id = layerConfig.id;
 		if (typeof id === 'undefined') throw new Error(`id is required.`);
 
@@ -544,7 +544,7 @@ class MapboxLayerManager extends LyrGrp {
 			return;
 
 		if (beforeId) {
-			const beforeParentPath = beforeId.slice(0, beforeId.lastIndexOf(options.separator) + 1);
+			const beforeParentPath = beforeId.slice(0, beforeId.lastIndexOf(this._separator) + 1);
 			if (parentPath !== beforeParentPath) throw new Error('These ids are not same group.');
 		}
 
