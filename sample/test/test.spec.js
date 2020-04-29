@@ -84,9 +84,34 @@ afterEach(function () {
 });
 
 describe('init', () => {
-	it('manager', () => {
+	it('default', () => {
 		chai.assert.strictEqual(manager._map, map);
 	})
+
+	it('separator', () => {
+		manager_dot = new MapboxLayerManager(map, {
+			separator: '.'
+		});
+		const groupId1 = 'group1'
+		manager_dot.addGroup({
+			id: groupId1
+		});
+		const layerConfig1 = dummyImageLayerConfig(groupId1 + '.image1', );
+		manager_dot.addLayer(layerConfig1);
+
+		const groupId2 = 'group1.group2'
+		manager_dot.addGroup({
+			id: groupId2
+		});
+
+		const layerConfig2 = dummyImageLayerConfig(groupId2 + '.image2', );
+		manager_dot.addLayer(layerConfig2);
+
+		chai.expect(getIds(manager_dot, 'all'))
+			.to.deep.equal([groupId1, layerConfig1.id, groupId2, layerConfig2.id]);
+
+		manager_dot = null;
+	});
 });
 
 describe('add/remove', () => {
@@ -963,31 +988,6 @@ describe('others', () => {
 		manager.addLayer(layerConfig1);
 		chai.assert.strictEqual(manager.invoke('getLayer', layerConfig1.id).id, layerConfig1.id)
 	})
-
-	it('separator', () => {
-		manager_dot = new MapboxLayerManager(map, {
-			separator: '.'
-		});
-		const groupId1 = 'group1'
-		manager_dot.addGroup({
-			id: groupId1
-		});
-		const layerConfig1 = dummyImageLayerConfig(groupId1 + '.image1', );
-		manager_dot.addLayer(layerConfig1);
-
-		const groupId2 = 'group1.group2'
-		manager_dot.addGroup({
-			id: groupId2
-		});
-
-		const layerConfig2 = dummyImageLayerConfig(groupId2 + '.image2', );
-		manager_dot.addLayer(layerConfig2);
-
-		chai.expect(getIds(manager_dot, 'all'))
-			.to.deep.equal([groupId1, layerConfig1.id, groupId2, layerConfig2.id]);
-
-		manager_dot = null;
-	});
 
 	it('opacity', () => {
 		const groupId1 = 'group1'
