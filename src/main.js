@@ -79,13 +79,14 @@ const removeList = (target, list) => {
 		return list.splice(list.indexOf(target), 1);
 }
 
-const getParentPath = (path) => {
+const getParentPath = (path, separator) => {
 	/**
 	 * 親のIDを取得する
 	 * @param {string} path - パス
+	 * @param {string} separator - 区切り文字
 	 * @param {string} parentPath - 親グループのパス
 	 */
-	const index = path.lastIndexOf(PATH_SEPARATOR);
+	const index = path.lastIndexOf(separator);
 	if (index < 0) return "";
 
 	return path.slice(0, index);
@@ -108,7 +109,7 @@ const getOpacityPropertyNames = (type) => {
 }
 
 class Lyr {
-	constructor(id, parent, options = {}) {
+	constructor(id, parent) {
 		this._id = id;
 		this._parent = parent;
 		this._type = options.type;
@@ -116,13 +117,17 @@ class Lyr {
 	}
 }
 class LyrGrp {
-	constructor(map, id, parent) {
+	constructor(map, id, parent, options = {}) {
+		options = $.extend(true, {
+			separator: PATH_SEPARATOR
+		}, options);
 		this._map = map;
 		this._lyrs = []
 		this._id = id;
 		this._parent = parent;
 		this._underlayId = '';
 		this._overlayId = '';
+		this._separator = options.separator;
 	}
 
 
@@ -196,8 +201,8 @@ class LyrGrp {
 			this._underlayId = groupId;
 		} else {
 			if (beforeId) {
-				const parentPath = getParentPath(groupId);
-				const beforeParentPath = getParentPath(beforeId);
+				const parentPath = getParentPath(groupId, this._separator);
+				const beforeParentPath = getParentPath(beforeId, this._separator);
 				if (parentPath !== beforeParentPath) {
 					throw new Error('beforeId is not same group.');
 				}
@@ -218,11 +223,13 @@ class LyrGrp {
 		let group
 		if (groupType === 'switch') {
 			group = new SwitchLyrGrp(this._map, groupId, this, {
-				visible
+				visible,
+				separator: this._separator
 			})
 		} else {
 			group = new MultiLyrGrp(this._map, groupId, this, {
-				visible
+				visible,
+				separator: this._separator
 			})
 		}
 		addList(group, this._lyrs, index);
@@ -293,8 +300,8 @@ class LyrGrp {
 			this._underlayId = id;
 		} else {
 			if (beforeId) {
-				const parentPath = getParentPath(id);
-				const beforeParentPath = getParentPath(beforeId);
+				const parentPath = getParentPath(id, this._separator);
+				const beforeParentPath = getParentPath(beforeId, this._separator);
 				if (parentPath !== beforeParentPath) throw new Error('beforeId is not same group.');
 
 				const beforeIndex = getIndexByKey(this._lyrs, '_id', beforeId);
@@ -343,7 +350,7 @@ class MultiLyrGrp extends LyrGrp {
 		options = $.extend(true, {
 			visible: true
 		}, options);
-		super(map, id, parent)
+		super(map, id, parent, options)
 		this._type = 'multi'
 		this._visible = options.visible;
 	}
@@ -354,7 +361,7 @@ class SwitchLyrGrp extends LyrGrp {
 		options = $.extend(true, {
 			visible: true
 		}, options);
-		super(map, id, parent)
+		super(map, id, parent, options)
 		this._type = 'switch'
 		this._visible = options.visible;
 		this._selectId = ''
@@ -414,7 +421,6 @@ class SwitchLyrGrp extends LyrGrp {
 class MapboxLayerManager extends LyrGrp {
 	constructor(map, options = {}) {
 		super(map, 'manager', undefined, options)
-		this.options = options;
 		this.version = version;
 		return this;
 	}
@@ -423,8 +429,8 @@ class MapboxLayerManager extends LyrGrp {
 		if (id === "") return this;
 
 		const _get = (parent, path, stage) => {
-			const chained = path.split(PATH_SEPARATOR);
-			const id = chained.slice(0, stage + 1).join(PATH_SEPARATOR)
+			const chained = path.split(options.separator);
+			const id = chained.slice(0, stage + 1).join(options.separator)
 			const index = getIndexByKey(parent._lyrs, '_id', id);
 			if (index >= 0) {
 				const lyr = parent._lyrs[index];
@@ -466,7 +472,7 @@ class MapboxLayerManager extends LyrGrp {
 
 		if (this._getById(id)) throw new Error(`Layer/Group with id "${id}" already exists on this manager.`);
 
-		const parentPath = getParentPath(id);
+		const parentPath = getParentPath(id, this._separator);
 		const parent = this._getById(parentPath);
 		if (typeof parent === 'undefined') throw new Error('not found parent layer group.');
 
@@ -487,7 +493,7 @@ class MapboxLayerManager extends LyrGrp {
 
 		if (this._getById(id)) throw new Error(`Layer/Group with id "${id}" already exists on this manager.`);
 
-		const parentPath = getParentPath(id);
+		const parentPath = getParentPath(id, this._separator);
 		const parent = this._getById(parentPath);
 		if (typeof parent === 'undefined') throw new Error('not found parent layer group.');
 
@@ -509,7 +515,7 @@ class MapboxLayerManager extends LyrGrp {
 		options = $.extend(true, {
 			force: false
 		}, options);
-		const parentPath = getParentPath(id);
+		const parentPath = getParentPath(id, this._separator);
 		const parent = this._getById(parentPath);
 
 		if (parent) {
@@ -523,7 +529,7 @@ class MapboxLayerManager extends LyrGrp {
 		options = $.extend(true, {
 			force: false
 		}, options);
-		const parentPath = getParentPath(id);
+		const parentPath = getParentPath(id, this._separator);
 		const parent = this._getById(parentPath);
 
 		if (parent) {
@@ -532,13 +538,13 @@ class MapboxLayerManager extends LyrGrp {
 	}
 
 	move(id, beforeId) {
-		const parentPath = getParentPath(id);
+		const parentPath = getParentPath(id, this._separator);
 		const parent = this._getById(parentPath);
 		if (id === beforeId)
 			return;
 
 		if (beforeId) {
-			const beforeParentPath = beforeId.slice(0, beforeId.lastIndexOf(PATH_SEPARATOR) + 1);
+			const beforeParentPath = beforeId.slice(0, beforeId.lastIndexOf(options.separator) + 1);
 			if (parentPath !== beforeParentPath) throw new Error('These ids are not same group.');
 		}
 
