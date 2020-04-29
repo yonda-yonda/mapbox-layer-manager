@@ -34,7 +34,7 @@ const getIndexByKey = (list, key, value) => {
 const getFirstLayerId = (lyrs, afterId = undefined) => {
 	/**
 	 * 先頭のレイヤーのIDを返す
-	 * @param {Lyr|LyrGrp[]} lyrs - 配列
+	 * @param {Layer|LayerGroup[]} lyrs - 配列
 	 * @param {string} afterId - 1階層目において、このIDの要素より後ろのレイヤーを探索対象とする
 	 * @return {string} 対象のレイヤー内で先頭のレイヤーのID
 	 */
@@ -49,7 +49,7 @@ const getFirstLayerId = (lyrs, afterId = undefined) => {
 
 	for (let i = startIndex; i < lyrs.length; i++) {
 		const lyr = lyrs[i];
-		if (lyr instanceof Lyr) {
+		if (lyr instanceof Layer) {
 			return lyr._id;
 		} else {
 			const id = getFirstLayerId(lyr._lyrs)
@@ -108,7 +108,7 @@ const getOpacityPropertyNames = (type) => {
 	return names
 }
 
-class Lyr {
+class Layer {
 	constructor(id, parent, options = {}) {
 		this._id = id;
 		this._parent = parent;
@@ -116,7 +116,7 @@ class Lyr {
 		this._visible = options.visible;
 	}
 }
-class LyrGrp {
+class LayerGroup {
 	constructor(map, id, parent, options = {}) {
 		options = $.extend(true, {
 			separator: PATH_SEPARATOR
@@ -143,7 +143,7 @@ class LyrGrp {
 		if (lyr) {
 			if (root === true || force === true)
 				lyr._visible = true;
-			if (lyr instanceof Lyr) {
+			if (lyr instanceof Layer) {
 				if (onVisiblePath === true && lyr._visible === true)
 					this._map.setLayoutProperty(lyr._id, 'visibility', 'visible');
 			} else {
@@ -164,7 +164,7 @@ class LyrGrp {
 		if (lyr) {
 			if (root === true || force === true)
 				lyr._visible = false;
-			if (lyr instanceof Lyr) {
+			if (lyr instanceof Layer) {
 				if (this._map.getLayer(lyr._id))
 					this._map.setLayoutProperty(lyr._id, 'visibility', 'none');
 			} else {
@@ -222,12 +222,12 @@ class LyrGrp {
 
 		let group
 		if (groupType === 'single') {
-			group = new SingleLyrGrp(this._map, groupId, this, {
+			group = new SingleLayerGroup(this._map, groupId, this, {
 				visible,
 				separator: this._separator
 			})
 		} else {
-			group = new MultiLyrGrp(this._map, groupId, this, {
+			group = new MultiLayerGroup(this._map, groupId, this, {
 				visible,
 				separator: this._separator
 			})
@@ -237,7 +237,7 @@ class LyrGrp {
 
 	_removeGroup(groupId) {
 		const grplyr = this._lyrs[getIndexByKey(this._lyrs, '_id', groupId)];
-		if (!(grplyr instanceof LyrGrp)) throw new Error(`${groupId} does not exist on this manager.`);
+		if (!(grplyr instanceof LayerGroup)) throw new Error(`${groupId} does not exist on this manager.`);
 
 		if (groupId === this._overlayId) {
 			this._overlayId = '';
@@ -248,7 +248,7 @@ class LyrGrp {
 		const _remove = (grplyr) => {
 			while (grplyr._lyrs.length > 0) {
 				const child = grplyr._lyrs.pop();
-				if (child instanceof LyrGrp) {
+				if (child instanceof LayerGroup) {
 					_remove(child);
 				} else {
 					if (this._map.getLayer(child.id))
@@ -287,7 +287,7 @@ class LyrGrp {
 		if (!onVisiblePath) layerConfig.layout.visibility = 'none';
 		const type = layerConfig.type;
 
-		const lyr = new Lyr(id, this, {
+		const lyr = new Layer(id, this, {
 			type,
 			visible
 		});
@@ -332,7 +332,7 @@ class LyrGrp {
 
 	_removeLayer(id) {
 		const lyr = this._lyrs[getIndexByKey(this._lyrs, '_id', id)];
-		if (!(lyr instanceof Lyr)) throw new Error('This id is not layer.');
+		if (!(lyr instanceof Layer)) throw new Error('This id is not layer.');
 
 		if (id === this._overlayId) {
 			this._overlayId = '';
@@ -345,7 +345,7 @@ class LyrGrp {
 	}
 }
 
-class MultiLyrGrp extends LyrGrp {
+class MultiLayerGroup extends LayerGroup {
 	constructor(map, id, parent, options = {}) {
 		options = $.extend(true, {
 			visible: true
@@ -356,7 +356,7 @@ class MultiLyrGrp extends LyrGrp {
 	}
 }
 
-class SingleLyrGrp extends LyrGrp {
+class SingleLayerGroup extends LayerGroup {
 	constructor(map, id, parent, options = {}) {
 		options = $.extend(true, {
 			visible: true
@@ -387,9 +387,9 @@ class SingleLyrGrp extends LyrGrp {
 
 		if (layerConfig.visible !== false) {
 			this._selectId = layerConfig.id;
-			this._lyrs.forEach((otherLyr) => {
-				if (otherLyr._id !== layerConfig.id)
-					this._hide(otherLyr._id, true)
+			this._lyrs.forEach((otherLayer) => {
+				if (otherLayer._id !== layerConfig.id)
+					this._hide(otherLayer._id, true)
 			})
 		}
 	}
@@ -403,9 +403,9 @@ class SingleLyrGrp extends LyrGrp {
 		super._addLayer(layerConfig, options);
 		if (typeof layerConfig.layout === 'undefined' || layerConfig.layout.visibility === 'visible') {
 			this._selectId = layerConfig.id;
-			this._lyrs.forEach((otherLyr) => {
-				if (otherLyr._id !== layerConfig.id)
-					this._hide(otherLyr._id, true)
+			this._lyrs.forEach((otherLayer) => {
+				if (otherLayer._id !== layerConfig.id)
+					this._hide(otherLayer._id, true)
 			})
 		}
 	}
@@ -418,7 +418,7 @@ class SingleLyrGrp extends LyrGrp {
 
 }
 
-class MapboxLayerManager extends LyrGrp {
+class MapboxLayerManager extends LayerGroup {
 	constructor(map, options = {}) {
 		super(map, 'manager', undefined, options)
 		this.version = version;
@@ -435,7 +435,7 @@ class MapboxLayerManager extends LyrGrp {
 			if (index >= 0) {
 				const lyr = parent._lyrs[index];
 
-				if (id !== path && lyr instanceof LyrGrp) {
+				if (id !== path && lyr instanceof LayerGroup) {
 					return _get(lyr, path, ++stage)
 				} else {
 					return lyr
@@ -481,7 +481,7 @@ class MapboxLayerManager extends LyrGrp {
 
 	removeGroup(groupId) {
 		const grplyr = this._getById(groupId);
-		if (!(grplyr instanceof LyrGrp)) throw new Error('This id is not group.');
+		if (!(grplyr instanceof LayerGroup)) throw new Error('This id is not group.');
 
 		const parent = grplyr._parent;
 		parent._removeGroup(grplyr._id);
@@ -505,7 +505,7 @@ class MapboxLayerManager extends LyrGrp {
 
 	removeLayer(id) {
 		const lyr = this._getById(id);
-		if (!(lyr instanceof Lyr)) throw new Error('This id is not layer.');
+		if (!(lyr instanceof Layer)) throw new Error('This id is not layer.');
 
 		const parent = lyr._parent;
 		parent._removeLayer(lyr._id);
@@ -570,7 +570,7 @@ class MapboxLayerManager extends LyrGrp {
 		const beforeLayerId = this._getParentNextLayerId(parent)
 
 		const _move = (lyr, beforeLayerId) => {
-			if (lyr instanceof LyrGrp) {
+			if (lyr instanceof LayerGroup) {
 				lyr._lyrs.forEach((lyr) => {
 					_move(lyr, beforeLayerId)
 				})
@@ -595,7 +595,7 @@ class MapboxLayerManager extends LyrGrp {
 		const lyr = this._getById(id);
 
 		const _setOpacity = (lyr, opacity) => {
-			if (lyr instanceof Lyr) {
+			if (lyr instanceof Layer) {
 				const propNames = getOpacityPropertyNames(lyr._type);
 
 				propNames.forEach((propName) => {
@@ -606,7 +606,7 @@ class MapboxLayerManager extends LyrGrp {
 					);
 				})
 			}
-			if (lyr instanceof LyrGrp) {
+			if (lyr instanceof LayerGroup) {
 				lyr._opacity = opacity;
 				lyr._lyrs.forEach((child) => {
 					_setOpacity(child, opacity);
@@ -625,12 +625,12 @@ class MapboxLayerManager extends LyrGrp {
 		const visiblity = options.visiblity;
 		const root = this._getById(id);
 
-		if (root instanceof Lyr) return [root._id];
+		if (root instanceof Layer) return [root._id];
 
 		const _getIds = (lyrs) => {
 			let ids = []
 			lyrs.forEach((lyr) => {
-				if (lyr instanceof Lyr) {
+				if (lyr instanceof Layer) {
 					if (visiblity === 'any')
 						ids.push(lyr._id);
 					if (visiblity === 'visible' && this._map.getLayoutProperty(lyr._id, 'visibility') === 'visible') {
@@ -640,7 +640,7 @@ class MapboxLayerManager extends LyrGrp {
 						ids.push(lyr._id);
 					}
 				}
-				if (lyr instanceof LyrGrp) {
+				if (lyr instanceof LayerGroup) {
 					ids = ids.concat(_getIds(lyr._lyrs))
 				}
 			})
