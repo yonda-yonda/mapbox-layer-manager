@@ -89,11 +89,9 @@ describe('init', () => {
 });
 
 describe('add/remove', () => {
-	it('add layer', () => {
+	it('property and order', () => {
 		const layerConfig1 = dummyImageLayerConfig('image1', 'visible');
 		manager.addLayer(layerConfig1);
-
-		// order and property
 		const lyr1 = manager._lyrs[0];
 		chai.assert.strictEqual(lyr1._id, layerConfig1.id)
 		chai.assert.strictEqual(lyr1._type, layerConfig1.type)
@@ -121,55 +119,69 @@ describe('add/remove', () => {
 		chai.assert.strictEqual(lyr3._visible, isVisibleConfig(layerConfig3))
 		chai.assert.strictEqual(lyr3._visible, manager.invoke('getLayoutProperty', lyr3._id, 'visibility') === 'visible')
 
-		const layerConfig4 = dummyImageLayerConfig('image4');
-		manager.addLayer(layerConfig4, {
-			fixedTo: 'underlay'
-		});
-		const lyr4 = manager._lyrs[0];
-		chai.assert.strictEqual(lyr4._id, layerConfig4.id)
-
-		const layerConfig5 = dummyImageLayerConfig('image5');
-		manager.addLayer(layerConfig5, {
-			fixedTo: 'underlay'
-		});
-		const lyr5 = manager._lyrs[0];
-		chai.assert.strictEqual(lyr5._id, layerConfig5.id)
-
-		const layerConfig6 = dummyImageLayerConfig('image6');
-		manager.addLayer(layerConfig6, {
-			fixedTo: 'overlay'
-		});
-		const lyr6 = manager._lyrs[manager._lyrs.length - 1];
-		chai.assert.strictEqual(lyr6._id, layerConfig6.id)
-
-		const layerConfig7 = dummyImageLayerConfig('image7');
-		manager.addLayer(layerConfig7, {
-			fixedTo: 'overlay'
-		});
-		const lyr7 = manager._lyrs[manager._lyrs.length - 1];
-		chai.assert.strictEqual(lyr7._id, layerConfig7.id)
-
-		// number of layer
-		chai.assert.strictEqual(getIds(manager, 'layer', 'visible').length, 6)
-		chai.assert.strictEqual(getIds(manager, 'layer').length, 7)
-		// actual layer
+		// number
+		chai.assert.strictEqual(getIds(manager, 'layer', 'visible').length, 2)
+		chai.assert.strictEqual(getIds(manager, 'layer').length, 3)
+		// actual number
 		chai.assert.strictEqual(manager.getLayerIds({
 			visiblity: 'visible'
-		}).length, 6)
+		}).length, 2)
 		chai.assert.strictEqual(manager.getLayerIds({
 			visiblity: 'none'
 		}).length, 1)
+	});
+	it('add underlay', () => {
+		const layerConfig1 = dummyImageLayerConfig('image1');
+		manager.addLayer(layerConfig1);
+		const layerConfig2 = dummyImageLayerConfig('image2');
+		manager.addLayer(layerConfig2, {
+			fixedTo: 'underlay'
+		})
+		chai.assert.strictEqual(manager._lyrs[1]._id, layerConfig1.id)
+		chai.assert.strictEqual(manager._lyrs[0]._id, layerConfig2.id)
 
-		// rise error(not added)
-		chai.expect(() => {
-			manager.addLayer(layerConfig1)
-		}).to.throw();
+		const layerConfig3 = dummyImageLayerConfig('image3');
+		manager.addLayer(layerConfig3, {
+			fixedTo: 'underlay'
+		})
+		chai.assert.strictEqual(manager._lyrs[2]._id, layerConfig1.id)
+		chai.assert.strictEqual(manager._lyrs[1]._id, layerConfig2.id)
+		chai.assert.strictEqual(manager._lyrs[0]._id, layerConfig3.id)
+
+		// not added
 		chai.expect(() => {
 			const layerConfigX = dummyImageLayerConfig('imageX');
 			manager.addLayer(layerConfigX, {
 				beforeId: manager._lyrs[0]
 			});
-		}).to.throw();
+		}).to.throw()
+		chai.assert.strictEqual(getIds(manager, 'layer', 'visible').length, 3)
+	});
+
+	it('add overlay', () => {
+		const layerConfig1 = dummyImageLayerConfig('image1');
+		manager.addLayer(layerConfig1);
+		const layerConfig2 = dummyImageLayerConfig('image2');
+		manager.addLayer(layerConfig2, {
+			fixedTo: 'overlay'
+		})
+		chai.assert.strictEqual(manager._lyrs[0]._id, layerConfig1.id)
+		chai.assert.strictEqual(manager._lyrs[1]._id, layerConfig2.id)
+
+		const layerConfig3 = dummyImageLayerConfig('image3');
+		manager.addLayer(layerConfig3, {
+			fixedTo: 'overlay'
+		})
+		chai.assert.strictEqual(manager._lyrs[0]._id, layerConfig1.id)
+		chai.assert.strictEqual(manager._lyrs[1]._id, layerConfig2.id)
+		chai.assert.strictEqual(manager._lyrs[2]._id, layerConfig3.id)
+
+		const layerConfig4 = dummyImageLayerConfig('image4');
+		manager.addLayer(layerConfig4);
+		chai.assert.strictEqual(manager._lyrs[0]._id, layerConfig1.id)
+		chai.assert.strictEqual(manager._lyrs[1]._id, layerConfig2.id)
+		chai.assert.strictEqual(manager._lyrs[3]._id, layerConfig3.id)
+		chai.assert.strictEqual(manager._lyrs[2]._id, layerConfig4.id)
 	});
 
 	it('add group', () => {
@@ -209,96 +221,14 @@ describe('add/remove', () => {
 		chai.assert.strictEqual(grp3._parent, manager)
 		chai.assert.strictEqual(grp3._visible, true)
 
-		const id4 = 'group4'
-		manager.addGroup({
-			id: id4
-		}, {
-			fixedTo: 'underlay'
-		});
-		const grp4 = manager._lyrs[0];
-		chai.assert.strictEqual(grp4._id, id4);
-
-		const id5 = 'group5'
-		manager.addGroup({
-			id: id5
-		}, {
-			fixedTo: 'underlay'
-		});
-		const grp5 = manager._lyrs[0];
-		chai.assert.strictEqual(grp5._id, id5);
-
-		const id6 = 'group6'
-		manager.addGroup({
-			id: id6
-		}, {
-			fixedTo: 'overlay'
-		});
-		const grp6 = manager._lyrs[manager._lyrs.length - 1];
-		chai.assert.strictEqual(grp6._id, id6);
-
-		const id7 = 'group7'
-		manager.addGroup({
-			id: id7
-		}, {
-			fixedTo: 'overlay'
-		});
-		const grp7 = manager._lyrs[manager._lyrs.length - 1];
-		chai.assert.strictEqual(grp7._id, id7);
-
 		// number of group
-		chai.assert.strictEqual(getIds(manager, 'group', 'visible').length, 6)
-		chai.assert.strictEqual(getIds(manager, 'group').length, 7)
+		chai.assert.strictEqual(getIds(manager, 'group', 'visible').length, 2)
+		chai.assert.strictEqual(getIds(manager, 'group').length, 3)
 		// actual layer
-		chai.assert.strictEqual(manager.getLayerIds().length, 0);
-
-		// rise error(not added)
-		chai.expect(() => {
-			manager.addGroup(id1);
-		}).to.throw();
-		chai.expect(() => {
-			manager.addGroup('groupX', {
-				beforeId: manager._lyrs[0]._id
-			});
-		}).to.throw();
-		chai.expect(() => {
-			manager.addGroup('groupX');
-		}).to.throw();
+		chai.assert.strictEqual(manager.getLayerIds().length, 0)
 	});
 
-	it('add fixed layer', () => {
-		const layerConfig1 = dummyImageLayerConfig('image1', 'visible');
-		manager.addLayer(layerConfig1);
-		const layerConfig2 = dummyImageLayerConfig('image2', 'visible');
-		manager.addLayer(layerConfig2, {
-			fixedTo: 'underlay'
-		});
-		const layerConfig3 = dummyImageLayerConfig('image3', 'visible');
-		manager.addLayer(layerConfig3, {
-			fixedTo: 'overlay'
-		});
-		const layerConfig4 = dummyImageLayerConfig('image4', 'visible');
-		manager.addLayer(layerConfig4);
-
-		chai.expect(getIds(manager, 'all'))
-			.to.deep.equal([layerConfig2.id, layerConfig1.id, layerConfig4.id, layerConfig3.id]);
-
-		const layerConfig5 = dummyImageLayerConfig('image5', 'visible');
-		manager.addLayer(layerConfig5, {
-			fixedTo: 'underlay'
-		});
-		const layerConfig6 = dummyImageLayerConfig('image6', 'visible');
-		manager.addLayer(layerConfig6, {
-			fixedTo: 'overlay'
-		});
-
-		chai.expect(getIds(manager, 'all'))
-			.to.deep.equal([layerConfig5.id, layerConfig2.id, layerConfig1.id,
-				layerConfig4.id, layerConfig3.id, layerConfig6.id
-			]);
-
-	})
-
-	it('add fixed group', () => {
+	it('add group to underlay', () => {
 		const id1 = 'group1'
 		manager.addGroup({
 			id: id1
@@ -309,36 +239,64 @@ describe('add/remove', () => {
 		}, {
 			fixedTo: 'underlay'
 		});
+
+		chai.assert.strictEqual(manager._lyrs[1]._id, id1)
+		chai.assert.strictEqual(manager._lyrs[0]._id, id2)
+
+		const id3 = 'group3'
+		manager.addGroup({
+			id: id3
+		}, {
+			fixedTo: 'underlay'
+		});
+		chai.assert.strictEqual(manager._lyrs[2]._id, id1)
+		chai.assert.strictEqual(manager._lyrs[1]._id, id2)
+		chai.assert.strictEqual(manager._lyrs[0]._id, id3)
+
+		chai.expect(() => {
+			manager.addGroup({
+				id: 'groupX'
+			}, {
+				beforeId: manager._lyrs[0]._id
+			});
+		}).to.throw()
+	});
+
+	it('add group to overlay', () => {
+		const id1 = 'group1'
+		manager.addGroup({
+			id: id1
+		});
+		const id2 = 'group2'
+		manager.addGroup({
+			id: id2
+		}, {
+			fixedTo: 'overlay'
+		});
+
+		chai.assert.strictEqual(manager._lyrs[0]._id, id1)
+		chai.assert.strictEqual(manager._lyrs[1]._id, id2)
+
 		const id3 = 'group3'
 		manager.addGroup({
 			id: id3
 		}, {
 			fixedTo: 'overlay'
 		});
+		chai.assert.strictEqual(manager._lyrs[0]._id, id1)
+		chai.assert.strictEqual(manager._lyrs[1]._id, id2)
+		chai.assert.strictEqual(manager._lyrs[2]._id, id3)
+
 		const id4 = 'group4'
 		manager.addGroup({
 			id: id4
 		});
+		chai.assert.strictEqual(manager._lyrs[0]._id, id1)
+		chai.assert.strictEqual(manager._lyrs[1]._id, id2)
+		chai.assert.strictEqual(manager._lyrs[3]._id, id3)
+		chai.assert.strictEqual(manager._lyrs[2]._id, id4)
+	});
 
-		chai.expect(getIds(manager, 'all'))
-			.to.deep.equal([id2, id1, id4, id3]);
-
-		const id5 = 'group5'
-		manager.addGroup({
-			id: id5
-		}, {
-			fixedTo: 'underlay'
-		});
-		const id6 = 'group6'
-		manager.addGroup({
-			id: id6
-		}, {
-			fixedTo: 'overlay'
-		});
-
-		chai.expect(getIds(manager, 'all'))
-			.to.deep.equal([id5, id2, id1, id4, id3, id6]);
-	})
 
 	it('add to group', () => {
 		const groupId1 = 'group1'
@@ -514,7 +472,7 @@ describe('add/remove', () => {
 		}).to.throw();
 	});
 
-	it('remove', () => {
+	it('remove layer and group', () => {
 		const groupId1 = 'group1'
 		manager.addGroup({
 			id: groupId1
@@ -617,7 +575,7 @@ describe('add/remove', () => {
 	});
 });
 
-describe('order change', () => {
+describe('change order', () => {
 	it('move', () => {
 		const layerConfig0 = dummyImageLayerConfig('image0', 'visible');
 		manager.addLayer(layerConfig0, {
@@ -701,7 +659,7 @@ describe('order change', () => {
 				groupId5, groupId6, layerConfig7.id, layerConfig8.id, groupId7, layerConfig9.id
 			]);
 
-		// rise error(not added)
+		// rise error
 		chai.expect(() => {
 			manager.move(layerConfig0.id, layerConfig3.id);
 		}).to.throw();
@@ -717,7 +675,7 @@ describe('order change', () => {
 	});
 });
 
-describe('visiblity change', () => {
+describe('change visiblity', () => {
 	it('show/hide', () => {
 		const layerConfig0 = dummyImageLayerConfig('image0', 'visible');
 		manager.addLayer(layerConfig0, {
@@ -901,7 +859,7 @@ describe('visiblity change', () => {
 	});
 });
 
-describe('layer type', () => {
+describe('type', () => {
 	it('shapes', () => {
 		const groupId1 = 'group1'
 		manager.addGroup({
