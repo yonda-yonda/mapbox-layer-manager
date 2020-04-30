@@ -85,7 +85,7 @@ afterEach(function () {
 
 describe('init', () => {
 	it('default', () => {
-		chai.assert.strictEqual(manager._map, map);
+		chai.assert.strictEqual(manager.map, map);
 	})
 
 	it('separator', () => {
