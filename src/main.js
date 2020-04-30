@@ -237,7 +237,8 @@ class LayerGroup {
 
 	_removeGroup(groupId) {
 		const grplyr = this._lyrs[getIndexByKey(this._lyrs, '_id', groupId)];
-		if (!(grplyr instanceof LayerGroup)) throw new Error(`${groupId} does not exist on this manager.`);
+		if (grplyr instanceof Layer) throw new Error(`${groupId} does not exist on this manager.`);
+		if (typeof grplyr === 'undefined') return;
 
 		if (groupId === this._overlayId) {
 			this._overlayId = '';
@@ -251,8 +252,8 @@ class LayerGroup {
 				if (child instanceof LayerGroup) {
 					_remove(child);
 				} else {
-					if (this.map.getLayer(child.id))
-						this.map.removeLayer(child.id)
+					if (this.map.getLayer(child._id))
+						this.map.removeLayer(child._id)
 				}
 			}
 		}
@@ -332,7 +333,8 @@ class LayerGroup {
 
 	_removeLayer(id) {
 		const lyr = this._lyrs[getIndexByKey(this._lyrs, '_id', id)];
-		if (!(lyr instanceof Layer)) throw new Error('This id is not layer.');
+		if (lyr instanceof LayerGroup) throw new Error('This id is not layer.');
+		if (typeof lyr === 'undefined') return;
 
 		if (id === this._overlayId) {
 			this._overlayId = '';
@@ -341,7 +343,8 @@ class LayerGroup {
 		}
 
 		removeList(lyr, this._lyrs);
-		this.map.removeLayer(id)
+		if (this.map.getLayer(id))
+			this.map.removeLayer(id)
 	}
 }
 
@@ -481,7 +484,8 @@ class MapboxLayerManager extends LayerGroup {
 
 	removeGroup(groupId) {
 		const grplyr = this._getById(groupId);
-		if (!(grplyr instanceof LayerGroup)) throw new Error('This id is not group.');
+		if (grplyr instanceof Layer) throw new Error('This id is not group.');
+		if (typeof grplyr === 'undefined') return;
 
 		const parent = grplyr._parent;
 		parent._removeGroup(grplyr._id);
@@ -505,7 +509,8 @@ class MapboxLayerManager extends LayerGroup {
 
 	removeLayer(id) {
 		const lyr = this._getById(id);
-		if (!(lyr instanceof Layer)) throw new Error('This id is not layer.');
+		if (lyr instanceof LayerGroup) throw new Error('This id is not layer.');
+		if (typeof lyr === 'undefined') return;
 
 		const parent = lyr._parent;
 		parent._removeLayer(lyr._id);
@@ -585,6 +590,10 @@ class MapboxLayerManager extends LayerGroup {
 		this.map.addSource(id, source)
 	}
 
+	removeSource(id) {
+		this.map.removeSource(id)
+	}
+
 	invoke(methodName) {
 		if (typeof this.map[methodName] === 'function') {
 			return this.map[methodName](...[].slice.call(arguments).slice(1));
@@ -631,12 +640,12 @@ class MapboxLayerManager extends LayerGroup {
 			let ids = []
 			lyrs.forEach((lyr) => {
 				if (lyr instanceof Layer) {
-					if (visiblity === 'any')
+					if (visiblity === 'any' && this.map.getLayer(lyr._id))
 						ids.push(lyr._id);
-					if (visiblity === 'visible' && this.map.getLayoutProperty(lyr._id, 'visibility') === 'visible') {
+					if (visiblity === 'visible' && this.map.getLayer(lyr._id) && this.map.getLayoutProperty(lyr._id, 'visibility') === 'visible') {
 						ids.push(lyr._id);
 					}
-					if (visiblity === 'none' && this.map.getLayoutProperty(lyr._id, 'visibility') === 'none') {
+					if (visiblity === 'none' && this.map.getLayer(lyr._id) && this.map.getLayoutProperty(lyr._id, 'visibility') === 'none') {
 						ids.push(lyr._id);
 					}
 				}

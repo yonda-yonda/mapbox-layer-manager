@@ -517,12 +517,11 @@ describe('add/remove', () => {
 
 		const groupId3 = groupId2 + '/group3'
 		manager.addGroup({
-			id: groupId3,
-			type: 'single'
+			id: groupId3
 		}, {
 			beforeId: layerConfig2.id
 		});
-		const layerConfig4 = dummyImageLayerConfig(groupId3 + '/image4', 'visible');
+		const layerConfig4 = dummyImageLayerConfig(groupId3 + '/image4', 'none');
 		manager.addLayer(layerConfig4);
 		const groupId4 = groupId3 + '/group4'
 		manager.addGroup({
@@ -537,7 +536,7 @@ describe('add/remove', () => {
 		const groupId5 = 'group5'
 		manager.addGroup({
 			id: groupId5,
-			'visible': false
+			'visible': true
 		});
 		const layerConfig7 = dummyImageLayerConfig(groupId5 + '/image7', 'visible');
 		manager.addLayer(layerConfig7);
@@ -562,32 +561,82 @@ describe('add/remove', () => {
 				groupId4, layerConfig5.id, layerConfig6.id, layerConfig2.id, layerConfig3.id,
 				groupId5, layerConfig7.id, layerConfig8.id, groupId6, layerConfig9.id, groupId7
 			]);
+		chai.expect(manager.getLayerIds({
+				visiblity: 'visible'
+			}))
+			.to.deep.equal([layerConfig1.id, layerConfig5.id, layerConfig6.id, layerConfig2.id, layerConfig7.id]);
+		chai.expect(manager.getLayerIds({
+				visiblity: 'any'
+			}))
+			.to.deep.equal([layerConfig1.id,
+				layerConfig4.id,
+				layerConfig5.id, layerConfig6.id, layerConfig2.id, layerConfig3.id,
+				layerConfig7.id, layerConfig8.id, layerConfig9.id
+			]);
 
-		chai.assert.strictEqual(manager._lyrs[1]._lyrs[0]._selectId, layerConfig6.id)
 		manager.removeLayer(layerConfig6.id);
-		chai.assert.strictEqual(manager._lyrs[1]._lyrs[0]._selectId, '')
+		chai.expect(manager.getLayerIds({
+				visiblity: 'visible'
+			}))
+			.to.deep.equal([layerConfig1.id, layerConfig5.id, layerConfig2.id, layerConfig7.id]);
+		chai.expect(getIds(manager, 'all'))
+			.to.deep.equal([groupId1, layerConfig1.id, groupId2,
+				groupId3, layerConfig4.id,
+				groupId4, layerConfig5.id, layerConfig2.id, layerConfig3.id,
+				groupId5, layerConfig7.id, layerConfig8.id, groupId6, layerConfig9.id, groupId7
+			]);
+		chai.expect(manager.getLayerIds({
+				visiblity: 'any'
+			}))
+			.to.deep.equal([layerConfig1.id,
+				layerConfig4.id,
+				layerConfig5.id, layerConfig2.id, layerConfig3.id,
+				layerConfig7.id, layerConfig8.id, layerConfig9.id
+			]);
+
+
+		manager.removeGroup(groupId4);
+		chai.expect(manager.getLayerIds({
+				visiblity: 'visible'
+			}))
+			.to.deep.equal([layerConfig1.id, layerConfig2.id, layerConfig7.id]);
+		chai.expect(getIds(manager, 'all'))
+			.to.deep.equal([groupId1, layerConfig1.id, groupId2,
+				groupId3, layerConfig4.id, layerConfig2.id, layerConfig3.id,
+				groupId5, layerConfig7.id, layerConfig8.id, groupId6, layerConfig9.id, groupId7
+			]);
+
+		chai.expect(manager.getLayerIds({
+				visiblity: 'any'
+			}))
+			.to.deep.equal([layerConfig1.id,
+				layerConfig4.id, layerConfig2.id, layerConfig3.id,
+				layerConfig7.id, layerConfig8.id, layerConfig9.id
+			]);
 
 		chai.assert.strictEqual(manager._lyrs[3]._lyrs[2]._selectId, groupId7)
 		manager.removeGroup(groupId7);
 		chai.assert.strictEqual(manager._lyrs[3]._lyrs[2]._selectId, '')
+		chai.expect(getIds(manager, 'all'))
+			.to.deep.equal([groupId1, layerConfig1.id, groupId2,
+				groupId3, layerConfig4.id, layerConfig2.id, layerConfig3.id,
+				groupId5, layerConfig7.id, layerConfig8.id, groupId6, layerConfig9.id
+			]);
 
-		manager.removeLayer(layerConfig3.id);
+		manager.removeGroup(groupId5);
 		chai.expect(getIds(manager, 'all'))
 			.to.deep.equal([groupId1, layerConfig1.id, groupId2,
-				groupId3, layerConfig4.id,
-				groupId4, layerConfig5.id, layerConfig2.id,
-				groupId5, layerConfig7.id, layerConfig8.id, groupId6, layerConfig9.id
+				groupId3, layerConfig4.id, layerConfig2.id, layerConfig3.id
 			]);
-		manager.removeGroup(groupId4);
-		chai.expect(getIds(manager, 'all'))
-			.to.deep.equal([groupId1, layerConfig1.id, groupId2,
-				groupId3, layerConfig4.id, layerConfig2.id,
-				groupId5, layerConfig7.id, layerConfig8.id, groupId6, layerConfig9.id
-			]);
-		manager.removeGroup(groupId2);
-		chai.expect(getIds(manager, 'all'))
-			.to.deep.equal([groupId1, layerConfig1.id,
-				groupId5, layerConfig7.id, layerConfig8.id, groupId6, layerConfig9.id
+		chai.expect(manager.getLayerIds({
+				visiblity: 'visible'
+			}))
+			.to.deep.equal([layerConfig1.id, layerConfig2.id]);
+		chai.expect(manager.getLayerIds({
+				visiblity: 'any'
+			}))
+			.to.deep.equal([layerConfig1.id,
+				layerConfig4.id, layerConfig2.id, layerConfig3.id
 			]);
 
 		// rise error(not added)
@@ -599,6 +648,32 @@ describe('add/remove', () => {
 		}).to.throw();
 
 	});
+	it('removed form map', () => {
+		const groupId1 = 'group1'
+		manager.addGroup({
+			id: groupId1
+		});
+
+		const layerConfig1 = dummyImageLayerConfig(groupId1 + '/image1', 'visible');
+		manager.addLayer(layerConfig1);
+		const layerConfig2 = dummyImageLayerConfig('image2', 'none');
+		manager.addLayer(layerConfig2);
+
+		chai.expect(manager.getLayerIds({
+				visiblity: 'any'
+			}))
+			.to.deep.equal([layerConfig1.id, layerConfig2.id]);
+		chai.expect(typeof manager.map.getLayer(layerConfig1.id)).to.not.equal('undefined');
+		chai.expect(typeof manager.map.getLayer(layerConfig2.id)).to.not.equal('undefined');
+		manager.removeGroup(groupId1);
+		manager.removeLayer(layerConfig2.id);
+		chai.expect(typeof manager.map.getLayer(layerConfig1.id)).to.equal('undefined');
+		chai.expect(typeof manager.map.getLayer(layerConfig2.id)).to.equal('undefined');
+		chai.expect(manager.getLayerIds({
+				visiblity: 'any'
+			}))
+			.to.deep.equal([]);
+	})
 });
 
 describe('change order', () => {

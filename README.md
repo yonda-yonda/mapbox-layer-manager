@@ -258,6 +258,19 @@ manager.addSource("tile_pale", {
 });
 ```
 
+### source削除
+`manager.removeSource(id)`
+
+removeSourceのwrapper
+
+### argument
+* `id` sourceのID (required)
+
+### example
+```js
+manager.removeSource("tile_pale");
+```
+
 ### mapのメソッド呼び出し
 `manager.invoke(funcName, args..)`
 
