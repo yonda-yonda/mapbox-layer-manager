@@ -34,6 +34,8 @@ const manager = new MapboxLayerManager(map);
 
 レイヤーを追加する。
 
+sourceを同時に追加する場合、同名IDでソースも登録される。
+
 ### argument
 * `layer` mapbox-glのaddLayerの第一引数と同じ (required)
 * `options` オプション
@@ -42,6 +44,36 @@ const manager = new MapboxLayerManager(map);
 * `beforeId` 指定されたIDのレイヤーオブジェクトの直前に追加する。
 * `fixedTo` 値(`overlay`or`underlay`)が指定された場合、最前面または最背面に固定する。
 			
+### example
+```js
+manager.addLayer({
+	id: "pale",
+	type: "raster",
+	source: {
+		type: "raster",
+		tiles: [
+			"https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png"
+		],
+		attribution: "<a href='http: //maps.gsi.go.jp/development/ichiran.html'>地理院タイル</a>",
+		tileSize: 256,
+		minzoom: 5,
+		maxzoom: 18
+	}",
+	layout: {
+		visibility: "visible"
+	}
+});
+```
+
+### 追加(ソース)
+`manager.addSource(id, source)`
+
+ソースを登録する。
+
+### argument
+* `id` sourceのID (required)
+* `source` sourceの設定 (required)
+
 ### example
 ```js
 manager.addSource("tile_pale", {
@@ -53,14 +85,6 @@ manager.addSource("tile_pale", {
 	tileSize: 256,
 	minzoom: 5,
 	maxzoom: 18
-});
-manager.addLayer({
-	id: "pale",
-	type: "raster",
-	source: "tile_pale",
-	layout: {
-		visibility: "visible"
-	}
 });
 ```
 
@@ -92,7 +116,11 @@ manager.addGroup({
 ```
 
 ### グループへ追加
+#### addLayer
 親となるグループを追加した上で、addLayerまたはaddGroupで`親のレイヤーグループID`+`区切り文字(/)`+`追加するレイヤーのID`をidに設定する。
+
+#### addSource
+親となるグループを追加した上で、`親のレイヤーグループID`+`区切り文字(/)`+`追加するソースのID`をidに設定する。
 
 ### example
 ```js
@@ -122,6 +150,11 @@ manager.addGroup({
 	id: "group1/group1"
 });
 
+manager.addSource('group1/shape', {
+	type: 'geojson',
+	data: '../shape.geojson'
+});
+
 ```
 ### シングルグループ
 直下のレイヤーオブジェクトのうち、表示状態にできるのは1つのみのグループ。
@@ -142,16 +175,33 @@ manager.addGroup({
 
 
 ### 削除(レイヤー)
-`manager.removeLayer(id)`
+`manager.removeLayer(id, options)`
 
 指定したレイヤーを削除する。
 
 ### argument
 * `id` 削除したいレイヤーID (required)
+* `options` オプション
+
+#### configuration of options
+* `withSource` 同名IDのソースも同時に削除するか デフォルトは`true`
 
 ### example
 ```js
 manager.removeLayer("tile_pale");
+```
+
+### 削除(ソース)
+`manager.removeSource(id)`
+
+登録したソースを削除する。
+
+### argument
+* `id` sourceのID (required)
+
+### example
+```js
+manager.removeSource("tile_pale");
 ```
 
 ### 削除(レイヤーグループ)
@@ -161,6 +211,10 @@ manager.removeLayer("tile_pale");
 
 ### argument
 * `id` 削除したいレイヤーID (required)
+* `options` オプション
+
+#### configuration of options
+* `withSource` 配下のソースも同時に削除するか デフォルトは`true`
 
 ### example
 ```js
@@ -233,42 +287,6 @@ manager.move("group1", "tile_pale");
 ### example
 ```js
 manager.setOpacity("group1", 0.8);
-```
-
-### source追加
-`manager.addSource(id, source)`
-
-addSourceのwrapper
-
-### argument
-* `id` sourceのID (required)
-* `source` sourceの設定 (required)
-
-### example
-```js
-manager.addSource("tile_pale", {
-	type: "raster",
-	tiles: [
-		"https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png"
-	],
-	attribution: "<a href='http: //maps.gsi.go.jp/development/ichiran.html'>地理院タイル</a>",
-	tileSize: 256,
-	minzoom: 5,
-	maxzoom: 18
-});
-```
-
-### source削除
-`manager.removeSource(id)`
-
-removeSourceのwrapper
-
-### argument
-* `id` sourceのID (required)
-
-### example
-```js
-manager.removeSource("tile_pale");
 ```
 
 ### mapのメソッド呼び出し

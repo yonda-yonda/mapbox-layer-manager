@@ -123,6 +123,7 @@ class LayerGroup {
 		}, options);
 		this.map = map;
 		this._lyrs = []
+		this._sources = new Set();
 		this._id = id;
 		this._parent = parent;
 		this._underlayId = '';
@@ -235,7 +236,10 @@ class LayerGroup {
 		addList(group, this._lyrs, index);
 	}
 
-	_removeGroup(groupId) {
+	_removeGroup(groupId, options = {}) {
+		options = $.extend(true, {
+			withSource: true
+		}, options);
 		const grplyr = this._lyrs[getIndexByKey(this._lyrs, '_id', groupId)];
 		if (grplyr instanceof Layer) throw new Error(`${groupId} does not exist on this manager.`);
 		if (typeof grplyr === 'undefined') return;
@@ -255,11 +259,14 @@ class LayerGroup {
 					if (this.map.getLayer(child._id))
 						this.map.removeLayer(child._id)
 				}
+				if (options.withSource)
+					grplyr._removeSource(child._id)
 			}
 		}
 
 		_remove(grplyr);
 		removeList(grplyr, this._lyrs);
+		this._removeSource(grplyr._id);
 	}
 
 	_addLayer(layerConfig, options = {}) {
@@ -329,9 +336,17 @@ class LayerGroup {
 				beforeLayerId = parentNextLayerId;
 		}
 		this.map.addLayer(layerConfig, beforeLayerId);
+
+		if (typeof layerConfig.source !== 'string') {
+			if (!this._sources.has(id))
+				this._sources.add(layerConfig.id);
+		}
 	}
 
-	_removeLayer(id) {
+	_removeLayer(id, options = {}) {
+		options = $.extend(true, {
+			withSource: true
+		}, options);
 		const lyr = this._lyrs[getIndexByKey(this._lyrs, '_id', id)];
 		if (lyr instanceof LayerGroup) throw new Error('This id is not layer.');
 		if (typeof lyr === 'undefined') return;
@@ -345,6 +360,23 @@ class LayerGroup {
 		removeList(lyr, this._lyrs);
 		if (this.map.getLayer(id))
 			this.map.removeLayer(id)
+		if (options.withSource && typeof this.map.style !== 'undefined' && this.map.getSource(id))
+			this._removeSource(id)
+	}
+
+	_addSource(id, sourceConfig) {
+		if (this._sources.has(id)) return;
+		this._sources.add(id);
+
+		if (typeof this.map.style === 'undefined' || !this.map.getSource(id))
+			this.map.addSource(id, sourceConfig);
+	}
+
+	_removeSource(id) {
+		if (!this._sources.has(id)) return;
+		this._sources.delete(id);
+		if (typeof this.map.style !== 'undefined' && this.map.getSource(id))
+			this.map.removeSource(id);
 	}
 }
 
@@ -482,13 +514,13 @@ class MapboxLayerManager extends LayerGroup {
 		parent._addGroup(layerConfig, options);
 	}
 
-	removeGroup(groupId) {
+	removeGroup(groupId, options = {}) {
 		const grplyr = this._getById(groupId);
 		if (grplyr instanceof Layer) throw new Error('This id is not group.');
 		if (typeof grplyr === 'undefined') return;
 
 		const parent = grplyr._parent;
-		parent._removeGroup(grplyr._id);
+		parent._removeGroup(grplyr._id, options);
 	}
 
 	addLayer(layerConfig, options = {}) {
@@ -507,13 +539,29 @@ class MapboxLayerManager extends LayerGroup {
 		}));
 	}
 
-	removeLayer(id) {
+	removeLayer(id, options = {}) {
 		const lyr = this._getById(id);
 		if (lyr instanceof LayerGroup) throw new Error('This id is not layer.');
 		if (typeof lyr === 'undefined') return;
 
 		const parent = lyr._parent;
-		parent._removeLayer(lyr._id);
+		parent._removeLayer(lyr._id, options);
+	}
+
+	addSource(id, sourceConfig) {
+		const parentPath = getParentPath(id, this._separator);
+		const parent = this._getById(parentPath);
+		if (typeof parent === 'undefined') throw new Error('not found parent layer group.');
+
+		parent._addSource(id, sourceConfig);
+	}
+
+	removeSource(id) {
+		const parentPath = getParentPath(id, this._separator);
+		const parent = this._getById(parentPath);
+		if (typeof parent === 'undefined') throw new Error('not found parent layer group.');
+
+		parent._removeSource(id);
 	}
 
 	show(id, options = {}) {
@@ -584,14 +632,6 @@ class MapboxLayerManager extends LayerGroup {
 			}
 		}
 		_move(lyr, beforeLayerId)
-	}
-
-	addSource(id, source) {
-		this.map.addSource(id, source)
-	}
-
-	removeSource(id) {
-		this.map.removeSource(id)
 	}
 
 	invoke(methodName) {

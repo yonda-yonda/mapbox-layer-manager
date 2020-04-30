@@ -114,7 +114,7 @@ describe('init', () => {
 	});
 });
 
-describe('add/remove', () => {
+describe('add/remove layer', () => {
 	it('property and order', () => {
 		const layerConfig1 = dummyImageLayerConfig('image1', 'visible');
 		manager.addLayer(layerConfig1);
@@ -674,6 +674,96 @@ describe('add/remove', () => {
 			}))
 			.to.deep.equal([]);
 	})
+});
+
+describe('source', () => {
+	it('add/remove ', () => {
+		manager.addSource('shape', {
+			type: 'geojson',
+			data: '../shape.geojson'
+		});
+		chai.expect(typeof manager.map.getSource('shape')).to.not.equal('undefined');
+		manager.removeSource('shape');
+		chai.expect(typeof manager.map.getSource('shape')).to.equal('undefined');
+	});
+
+	it('add/remove with layer', () => {
+		const layerConfig1 = dummyImageLayerConfig('image1', 'visible');
+		manager.addLayer(layerConfig1);
+		chai.expect(typeof manager.map.getSource(layerConfig1.id)).to.not.equal('undefined');
+
+		manager.removeLayer(layerConfig1.id);
+		chai.expect(typeof manager.map.getSource(layerConfig1.id)).to.equal('undefined');
+	});
+
+	it('add/remove with group', () => {
+		const groupId1 = 'group1'
+		manager.addGroup({
+			id: groupId1
+		});
+		manager.addSource(groupId1, {
+			type: 'geojson',
+			data: '../shape.geojson'
+		});
+		const layerConfig1 = dummyImageLayerConfig(groupId1 + '/image1', 'visible');
+		manager.addLayer(layerConfig1);
+		const layerConfig2 = dummyImageLayerConfig(groupId1 + '/image2', 'visible');
+		manager.addLayer(layerConfig2);
+		const groupId2 = groupId1 + '/group1'
+		manager.addGroup({
+			id: groupId2
+		});
+		manager.addSource(groupId2, {
+			type: 'geojson',
+			data: '../shape.geojson'
+		});
+		const layerConfig3 = dummyImageLayerConfig(groupId2 + '/image1', 'visible');
+		manager.addLayer(layerConfig3);
+
+		chai.expect(typeof manager.map.getSource(layerConfig1.id)).to.not.equal('undefined');
+		chai.expect(typeof manager.map.getSource(layerConfig2.id)).to.not.equal('undefined');
+		chai.expect(typeof manager.map.getSource(layerConfig3.id)).to.not.equal('undefined');
+		chai.expect(typeof manager.map.getSource(groupId1)).to.not.equal('undefined');
+		chai.expect(typeof manager.map.getSource(groupId2)).to.not.equal('undefined');
+
+		manager.removeGroup(groupId1);
+		chai.expect(typeof manager.map.getSource(layerConfig1.id)).to.equal('undefined');
+		chai.expect(typeof manager.map.getSource(layerConfig2.id)).to.equal('undefined');
+		chai.expect(typeof manager.map.getSource(layerConfig3.id)).to.equal('undefined');
+		chai.expect(typeof manager.map.getSource(groupId1)).to.equal('undefined');
+		chai.expect(typeof manager.map.getSource(groupId2)).to.equal('undefined');
+	});
+
+	it('remain', () => {
+		const groupId1 = 'group1'
+		manager.addGroup({
+			id: groupId1
+		});
+		const layerConfig1 = dummyImageLayerConfig(groupId1 + '/image1', 'visible');
+		manager.addLayer(layerConfig1);
+		const layerConfig2 = dummyImageLayerConfig(groupId1 + '/image2', 'visible');
+		manager.addLayer(layerConfig2);
+		const groupId2 = groupId1 + '/group1'
+		manager.addGroup({
+			id: groupId2
+		});
+		const layerConfig3 = dummyImageLayerConfig(groupId2 + '/image1', 'visible');
+		manager.addLayer(layerConfig3);
+
+		chai.expect(typeof manager.map.getSource(layerConfig1.id)).to.not.equal('undefined');
+		manager.removeLayer(layerConfig1.id, {
+			withSource: false
+		});
+		chai.expect(typeof manager.map.getSource(layerConfig1.id)).to.not.equal('undefined');
+
+		manager.removeGroup(groupId1, {
+			withSource: false
+		});
+		chai.expect(typeof manager.map.getSource(layerConfig1.id)).to.not.equal('undefined');
+		chai.expect(typeof manager.map.getSource(layerConfig2.id)).to.not.equal('undefined');
+		chai.expect(typeof manager.map.getSource(layerConfig3.id)).to.not.equal('undefined');
+	});
+
 });
 
 describe('change order', () => {
