@@ -289,6 +289,15 @@ manager.move("group1", "tile_pale");
 manager.setOpacity("group1", 0.8);
 ```
 
+### Layerへのイベント関連付け
+`manager.on(type, id, listener)`
+
+`manager.off(type, id, listener)`
+
+on/offのwrapper
+
+現状ラスターレイヤーへの関連付けはできない。
+
 ### mapのメソッド呼び出し
 `manager.invoke(funcName, args..)`
 

@@ -121,7 +121,7 @@ class LayerGroup {
 		options = $.extend(true, {
 			separator: PATH_SEPARATOR
 		}, options);
-		this.map = map;
+		this._map = map;
 		this._lyrs = []
 		this._sources = new Set();
 		this._id = id;
@@ -146,7 +146,7 @@ class LayerGroup {
 				lyr._visible = true;
 			if (lyr instanceof Layer) {
 				if (onVisiblePath === true && lyr._visible === true)
-					this.map.setLayoutProperty(lyr._id, 'visibility', 'visible');
+					this._map.setLayoutProperty(lyr._id, 'visibility', 'visible');
 			} else {
 				lyr._lyrs.forEach((child) => {
 					lyr._show(child._id, false, options)
@@ -166,8 +166,8 @@ class LayerGroup {
 			if (root === true || force === true)
 				lyr._visible = false;
 			if (lyr instanceof Layer) {
-				if (this.map.getLayer(lyr._id))
-					this.map.setLayoutProperty(lyr._id, 'visibility', 'none');
+				if (this._map.getLayer(lyr._id))
+					this._map.setLayoutProperty(lyr._id, 'visibility', 'none');
 			} else {
 				lyr._lyrs.forEach((child) => {
 					lyr._hide(child._id, false, options)
@@ -223,12 +223,12 @@ class LayerGroup {
 
 		let group
 		if (groupType === 'single') {
-			group = new SingleLayerGroup(this.map, groupId, this, {
+			group = new SingleLayerGroup(this._map, groupId, this, {
 				visible,
 				separator: this._separator
 			})
 		} else {
-			group = new MultiLayerGroup(this.map, groupId, this, {
+			group = new MultiLayerGroup(this._map, groupId, this, {
 				visible,
 				separator: this._separator
 			})
@@ -256,8 +256,8 @@ class LayerGroup {
 				if (child instanceof LayerGroup) {
 					_remove(child);
 				} else {
-					if (this.map.getLayer(child._id))
-						this.map.removeLayer(child._id)
+					if (this._map.getLayer(child._id))
+						this._map.removeLayer(child._id)
 				}
 				if (options.withSource)
 					grplyr._removeSource(child._id)
@@ -335,7 +335,7 @@ class LayerGroup {
 			if (typeof beforeLayerId === 'undefined')
 				beforeLayerId = parentNextLayerId;
 		}
-		this.map.addLayer(layerConfig, beforeLayerId);
+		this._map.addLayer(layerConfig, beforeLayerId);
 
 		if (typeof layerConfig.source !== 'string') {
 			if (!this._sources.has(id))
@@ -358,9 +358,9 @@ class LayerGroup {
 		}
 
 		removeList(lyr, this._lyrs);
-		if (this.map.getLayer(id))
-			this.map.removeLayer(id)
-		if (options.withSource && typeof this.map.style !== 'undefined' && this.map.getSource(id))
+		if (this._map.getLayer(id))
+			this._map.removeLayer(id)
+		if (options.withSource && typeof this._map.style !== 'undefined' && this._map.getSource(id))
 			this._removeSource(id)
 	}
 
@@ -368,15 +368,15 @@ class LayerGroup {
 		if (this._sources.has(id)) return;
 		this._sources.add(id);
 
-		if (typeof this.map.style === 'undefined' || !this.map.getSource(id))
-			this.map.addSource(id, sourceConfig);
+		if (typeof this._map.style === 'undefined' || !this._map.getSource(id))
+			this._map.addSource(id, sourceConfig);
 	}
 
 	_removeSource(id) {
 		if (!this._sources.has(id)) return;
 		this._sources.delete(id);
-		if (typeof this.map.style !== 'undefined' && this.map.getSource(id))
-			this.map.removeSource(id);
+		if (typeof this._map.style !== 'undefined' && this._map.getSource(id))
+			this._map.removeSource(id);
 	}
 }
 
@@ -628,15 +628,15 @@ class MapboxLayerManager extends LayerGroup {
 					_move(lyr, beforeLayerId)
 				})
 			} else {
-				this.map.moveLayer(lyr._id, beforeLayerId)
+				this._map.moveLayer(lyr._id, beforeLayerId)
 			}
 		}
 		_move(lyr, beforeLayerId)
 	}
 
 	invoke(methodName) {
-		if (typeof this.map[methodName] === 'function') {
-			return this.map[methodName](...[].slice.call(arguments).slice(1));
+		if (typeof this._map[methodName] === 'function') {
+			return this._map[methodName](...[].slice.call(arguments).slice(1));
 		}
 	}
 
@@ -648,7 +648,7 @@ class MapboxLayerManager extends LayerGroup {
 				const propNames = getOpacityPropertyNames(lyr._type);
 
 				propNames.forEach((propName) => {
-					this.map.setPaintProperty(
+					this._map.setPaintProperty(
 						lyr._id,
 						propName,
 						opacity
@@ -663,6 +663,18 @@ class MapboxLayerManager extends LayerGroup {
 			}
 		}
 		_setOpacity(lyr, opacity);
+	}
+
+	on(type, id, listener) {
+		const lyr = this._getById(id);
+		if (lyr instanceof LayerGroup) throw new Error('This id is not layer.');
+		this._map.on(type, id, listener)
+	}
+
+	off(type, id, listener) {
+		const lyr = this._getById(id);
+		if (lyr instanceof LayerGroup) throw new Error('This id is not layer.');
+		this._map.off(type, id, listener)
 	}
 
 	getLayerIds(options = {}) {
@@ -680,12 +692,12 @@ class MapboxLayerManager extends LayerGroup {
 			let ids = []
 			lyrs.forEach((lyr) => {
 				if (lyr instanceof Layer) {
-					if (visiblity === 'any' && this.map.getLayer(lyr._id))
+					if (visiblity === 'any' && this._map.getLayer(lyr._id))
 						ids.push(lyr._id);
-					if (visiblity === 'visible' && this.map.getLayer(lyr._id) && this.map.getLayoutProperty(lyr._id, 'visibility') === 'visible') {
+					if (visiblity === 'visible' && this._map.getLayer(lyr._id) && this._map.getLayoutProperty(lyr._id, 'visibility') === 'visible') {
 						ids.push(lyr._id);
 					}
-					if (visiblity === 'none' && this.map.getLayer(lyr._id) && this.map.getLayoutProperty(lyr._id, 'visibility') === 'none') {
+					if (visiblity === 'none' && this._map.getLayer(lyr._id) && this._map.getLayoutProperty(lyr._id, 'visibility') === 'none') {
 						ids.push(lyr._id);
 					}
 				}

@@ -85,7 +85,7 @@ afterEach(function () {
 
 describe('init', () => {
 	it('default', () => {
-		chai.assert.strictEqual(manager.map, map);
+		chai.assert.strictEqual(manager._map, map);
 	})
 
 	it('separator', () => {
@@ -663,12 +663,12 @@ describe('add/remove layer', () => {
 				visiblity: 'any'
 			}))
 			.to.deep.equal([layerConfig1.id, layerConfig2.id]);
-		chai.expect(typeof manager.map.getLayer(layerConfig1.id)).to.not.equal('undefined');
-		chai.expect(typeof manager.map.getLayer(layerConfig2.id)).to.not.equal('undefined');
+		chai.expect(typeof manager._map.getLayer(layerConfig1.id)).to.not.equal('undefined');
+		chai.expect(typeof manager._map.getLayer(layerConfig2.id)).to.not.equal('undefined');
 		manager.removeGroup(groupId1);
 		manager.removeLayer(layerConfig2.id);
-		chai.expect(typeof manager.map.getLayer(layerConfig1.id)).to.equal('undefined');
-		chai.expect(typeof manager.map.getLayer(layerConfig2.id)).to.equal('undefined');
+		chai.expect(typeof manager._map.getLayer(layerConfig1.id)).to.equal('undefined');
+		chai.expect(typeof manager._map.getLayer(layerConfig2.id)).to.equal('undefined');
 		chai.expect(manager.getLayerIds({
 				visiblity: 'any'
 			}))
@@ -682,18 +682,18 @@ describe('source', () => {
 			type: 'geojson',
 			data: '../shape.geojson'
 		});
-		chai.expect(typeof manager.map.getSource('shape')).to.not.equal('undefined');
+		chai.expect(typeof manager._map.getSource('shape')).to.not.equal('undefined');
 		manager.removeSource('shape');
-		chai.expect(typeof manager.map.getSource('shape')).to.equal('undefined');
+		chai.expect(typeof manager._map.getSource('shape')).to.equal('undefined');
 	});
 
 	it('add/remove with layer', () => {
 		const layerConfig1 = dummyImageLayerConfig('image1', 'visible');
 		manager.addLayer(layerConfig1);
-		chai.expect(typeof manager.map.getSource(layerConfig1.id)).to.not.equal('undefined');
+		chai.expect(typeof manager._map.getSource(layerConfig1.id)).to.not.equal('undefined');
 
 		manager.removeLayer(layerConfig1.id);
-		chai.expect(typeof manager.map.getSource(layerConfig1.id)).to.equal('undefined');
+		chai.expect(typeof manager._map.getSource(layerConfig1.id)).to.equal('undefined');
 	});
 
 	it('add/remove with group', () => {
@@ -720,18 +720,18 @@ describe('source', () => {
 		const layerConfig3 = dummyImageLayerConfig(groupId2 + '/image1', 'visible');
 		manager.addLayer(layerConfig3);
 
-		chai.expect(typeof manager.map.getSource(layerConfig1.id)).to.not.equal('undefined');
-		chai.expect(typeof manager.map.getSource(layerConfig2.id)).to.not.equal('undefined');
-		chai.expect(typeof manager.map.getSource(layerConfig3.id)).to.not.equal('undefined');
-		chai.expect(typeof manager.map.getSource(groupId1)).to.not.equal('undefined');
-		chai.expect(typeof manager.map.getSource(groupId2)).to.not.equal('undefined');
+		chai.expect(typeof manager._map.getSource(layerConfig1.id)).to.not.equal('undefined');
+		chai.expect(typeof manager._map.getSource(layerConfig2.id)).to.not.equal('undefined');
+		chai.expect(typeof manager._map.getSource(layerConfig3.id)).to.not.equal('undefined');
+		chai.expect(typeof manager._map.getSource(groupId1)).to.not.equal('undefined');
+		chai.expect(typeof manager._map.getSource(groupId2)).to.not.equal('undefined');
 
 		manager.removeGroup(groupId1);
-		chai.expect(typeof manager.map.getSource(layerConfig1.id)).to.equal('undefined');
-		chai.expect(typeof manager.map.getSource(layerConfig2.id)).to.equal('undefined');
-		chai.expect(typeof manager.map.getSource(layerConfig3.id)).to.equal('undefined');
-		chai.expect(typeof manager.map.getSource(groupId1)).to.equal('undefined');
-		chai.expect(typeof manager.map.getSource(groupId2)).to.equal('undefined');
+		chai.expect(typeof manager._map.getSource(layerConfig1.id)).to.equal('undefined');
+		chai.expect(typeof manager._map.getSource(layerConfig2.id)).to.equal('undefined');
+		chai.expect(typeof manager._map.getSource(layerConfig3.id)).to.equal('undefined');
+		chai.expect(typeof manager._map.getSource(groupId1)).to.equal('undefined');
+		chai.expect(typeof manager._map.getSource(groupId2)).to.equal('undefined');
 	});
 
 	it('remain', () => {
@@ -750,18 +750,18 @@ describe('source', () => {
 		const layerConfig3 = dummyImageLayerConfig(groupId2 + '/image1', 'visible');
 		manager.addLayer(layerConfig3);
 
-		chai.expect(typeof manager.map.getSource(layerConfig1.id)).to.not.equal('undefined');
+		chai.expect(typeof manager._map.getSource(layerConfig1.id)).to.not.equal('undefined');
 		manager.removeLayer(layerConfig1.id, {
 			withSource: false
 		});
-		chai.expect(typeof manager.map.getSource(layerConfig1.id)).to.not.equal('undefined');
+		chai.expect(typeof manager._map.getSource(layerConfig1.id)).to.not.equal('undefined');
 
 		manager.removeGroup(groupId1, {
 			withSource: false
 		});
-		chai.expect(typeof manager.map.getSource(layerConfig1.id)).to.not.equal('undefined');
-		chai.expect(typeof manager.map.getSource(layerConfig2.id)).to.not.equal('undefined');
-		chai.expect(typeof manager.map.getSource(layerConfig3.id)).to.not.equal('undefined');
+		chai.expect(typeof manager._map.getSource(layerConfig1.id)).to.not.equal('undefined');
+		chai.expect(typeof manager._map.getSource(layerConfig2.id)).to.not.equal('undefined');
+		chai.expect(typeof manager._map.getSource(layerConfig3.id)).to.not.equal('undefined');
 	});
 
 });
@@ -1263,5 +1263,10 @@ describe('others', () => {
 		manager.setOpacity(groupId2, 0.1)
 		chai.expect(getOpacities(groupId1))
 			.to.deep.equal([0.8, 0.1, 0.1, 0.8, 0.8, 0.8]);
+
+		manager.off('click', layerConfig3.id, function () {
+			console.log('aaa')
+		})
+		console.log(manager._map.getLayer(layerConfig3.id))
 	});
 });
