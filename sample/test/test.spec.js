@@ -1263,10 +1263,5 @@ describe('others', () => {
 		manager.setOpacity(groupId2, 0.1)
 		chai.expect(getOpacities(groupId1))
 			.to.deep.equal([0.8, 0.1, 0.1, 0.8, 0.8, 0.8]);
-
-		manager.off('click', layerConfig3.id, function () {
-			console.log('aaa')
-		})
-		console.log(manager._map.getLayer(layerConfig3.id))
 	});
 });
