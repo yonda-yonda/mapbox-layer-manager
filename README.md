@@ -221,6 +221,24 @@ manager.removeSource("tile_pale");
 manager.removeGroup("group1");
 ```
 
+### リセット
+`manager.reset(options)`
+
+全て削除する。
+
+### argument
+* `options` オプション
+
+#### configuration of options
+* `id:` 指定した要素の配下を全て削除する。 未指定の場合はmanager配下を全て削除する。
+
+
+### example
+```js
+manager.reset();
+```
+
+
 ### 表示
 `manager.show(id, options)`
 

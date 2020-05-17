@@ -254,7 +254,7 @@ class LayerGroup {
 
 		const _remove = (grplyr) => {
 			while (grplyr._lyrs.length > 0) {
-				const child = grplyr._lyrs.pop();
+				let child = grplyr._lyrs.pop();
 				if (child instanceof LayerGroup) {
 					_remove(child);
 				} else {
@@ -263,6 +263,7 @@ class LayerGroup {
 				}
 				if (options.withSource)
 					grplyr._removeSource(child._id)
+				child = null;
 			}
 		}
 
@@ -714,6 +715,27 @@ class MapboxLayerManager extends LayerGroup {
 			return ids
 		}
 		return _getIds(root._lyrs);
+	}
+
+	reset(options = {}) {
+		options = $.extend(true, {
+			id: ''
+		}, options);
+		const id = options.id;
+		const root = this._getById(id);
+
+		if (root instanceof LayerGroup) {
+			let lyrs = [].concat(root._lyrs)
+			lyrs.forEach((lyr) => {
+				if (lyr instanceof Layer) {
+					root._removeLayer(lyr._id);
+				}
+				if (lyr instanceof LayerGroup) {
+					root._removeGroup(lyr._id);
+				}
+			})
+			lyrs = null;
+		}
 	}
 }
 

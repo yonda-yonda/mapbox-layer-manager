@@ -674,6 +674,59 @@ describe('add/remove layer', () => {
 			}))
 			.to.deep.equal([]);
 	})
+
+	it('reset', () => {
+		const groupId1 = 'group1'
+		manager.addGroup({
+			id: groupId1
+		});
+
+		const groupId2 = 'group2'
+		manager.addGroup({
+			id: groupId2
+		});
+		const layerConfig1 = dummyImageLayerConfig(groupId1 + '/image1', 'visible');
+		manager.addLayer(layerConfig1);
+
+		const layerConfig2 = dummyImageLayerConfig(groupId2 + '/image2', 'visible');
+		manager.addLayer(layerConfig2);
+		const layerConfig3 = dummyImageLayerConfig(groupId2 + '/image3', 'none');
+		manager.addLayer(layerConfig3);
+
+		const groupId3 = groupId2 + '/group3'
+		manager.addGroup({
+			id: groupId3,
+			type: 'single'
+		}, {
+			beforeId: layerConfig3.id
+		});
+		const layerConfig4 = dummyImageLayerConfig(groupId3 + '/image4', 'visible');
+		manager.addLayer(layerConfig4);
+		const groupId4 = groupId3 + '/group4'
+		manager.addGroup({
+			id: groupId4,
+			type: 'single'
+		}, {
+			fixedTo: 'overlay'
+		});
+		const layerConfig5 = dummyImageLayerConfig(groupId4 + '/image5', 'visible');
+		manager.addLayer(layerConfig5);
+		chai.expect(getIds(manager, 'all'))
+			.to.deep.equal([groupId1, layerConfig1.id, groupId2,
+				layerConfig2.id, groupId3, layerConfig4.id, groupId4, layerConfig5.id, layerConfig3.id
+			]);
+		manager.reset({
+			id: groupId3
+		})
+		chai.expect(getIds(manager, 'all'))
+			.to.deep.equal([groupId1, layerConfig1.id, groupId2,
+				layerConfig2.id, groupId3, layerConfig3.id
+			]);
+
+		manager.reset()
+		chai.expect(getIds(manager, 'all'))
+			.to.deep.equal([]);
+	})
 });
 
 describe('source', () => {
@@ -1293,7 +1346,7 @@ describe('others', () => {
 		chai.assert.strictEqual(manager.isVisible(groupId1), false);
 		chai.assert.strictEqual(manager.isVisible(layerConfig2.id), false);
 		chai.assert.strictEqual(manager.isVisible(layerConfig3.id), false);
-		console.log(manager._lyrs)
+
 		chai.assert.strictEqual(manager.isVisible(layerConfig2.id, {
 			ownStatus: true
 		}), true);
