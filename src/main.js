@@ -119,7 +119,8 @@ class Layer {
 class LayerGroup {
 	constructor(map, id, parent, options = {}) {
 		options = $.extend(true, {
-			separator: PATH_SEPARATOR
+			separator: PATH_SEPARATOR,
+			visible: true
 		}, options);
 		this._map = map;
 		this._lyrs = []
@@ -128,6 +129,7 @@ class LayerGroup {
 		this._parent = parent;
 		this._underlayId = '';
 		this._overlayId = '';
+		this._visible = options.visible;
 		this._separator = options.separator;
 	}
 
@@ -382,23 +384,15 @@ class LayerGroup {
 
 class MultiLayerGroup extends LayerGroup {
 	constructor(map, id, parent, options = {}) {
-		options = $.extend(true, {
-			visible: true
-		}, options);
 		super(map, id, parent, options)
 		this._type = 'multi'
-		this._visible = options.visible;
 	}
 }
 
 class SingleLayerGroup extends LayerGroup {
 	constructor(map, id, parent, options = {}) {
-		options = $.extend(true, {
-			visible: true
-		}, options);
 		super(map, id, parent, options)
 		this._type = 'single'
-		this._visible = options.visible;
 		this._selectId = ''
 	}
 
@@ -638,6 +632,17 @@ class MapboxLayerManager extends LayerGroup {
 		if (typeof this._map[methodName] === 'function') {
 			return this._map[methodName](...[].slice.call(arguments).slice(1));
 		}
+	}
+
+	isVisible(id, options) {
+		options = $.extend(true, {
+			ownStatus: false
+		}, options);
+		const lyr = this._getById(id);
+		if (options.ownStatus === true) {
+			return lyr && lyr._visible
+		}
+		return this._onVisiblePath(lyr)
 	}
 
 	setOpacity(id, opacity) {

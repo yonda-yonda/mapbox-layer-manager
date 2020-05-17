@@ -289,6 +289,23 @@ manager.move("group1", "tile_pale");
 manager.setOpacity("group1", 0.8);
 ```
 
+### 表示状態の確認
+`manager.isVisible(id, options)`
+
+指定したレイヤーオブジェクトの表示状態を確認にする。
+
+### argument
+* `options` オプション
+
+#### configuration of options
+* `ownStatus:` 祖先に表示ステータス(visible)に関わらず自身の表示ステータスのみ参照する。 デフォルトは`false`
+
+### example
+```js
+manager.isVisible("group1");
+```
+
+
 ### Layerへのイベント関連付け
 `manager.on(type, id, listener)`
 

@@ -1264,4 +1264,41 @@ describe('others', () => {
 		chai.expect(getOpacities(groupId1))
 			.to.deep.equal([0.8, 0.1, 0.1, 0.8, 0.8, 0.8]);
 	});
+
+	it('isVisible', () => {
+		const layerConfig1 = dummyImageLayerConfig('image1', 'visible');
+		manager.addLayer(layerConfig1);
+
+		const groupId1 = 'group1'
+		manager.addGroup({
+			id: groupId1
+		});
+
+
+		const layerConfig2 = dummyImageLayerConfig(groupId1 + '/image2', 'visible');
+		manager.addLayer(layerConfig2);
+
+		const layerConfig3 = dummyImageLayerConfig(groupId1 + '/image3', 'none');
+		manager.addLayer(layerConfig3);
+
+		const layerConfig4 = dummyImageLayerConfig('image4', 'none');
+		manager.addLayer(layerConfig4);
+
+		chai.assert.strictEqual(manager.isVisible(layerConfig1.id), true);
+		chai.assert.strictEqual(manager.isVisible(layerConfig4.id), false);
+		chai.assert.strictEqual(manager.isVisible(groupId1), true);
+		chai.assert.strictEqual(manager.isVisible(layerConfig2.id), true);
+		chai.assert.strictEqual(manager.isVisible(layerConfig3.id), false);
+		manager.hide(groupId1);
+		chai.assert.strictEqual(manager.isVisible(groupId1), false);
+		chai.assert.strictEqual(manager.isVisible(layerConfig2.id), false);
+		chai.assert.strictEqual(manager.isVisible(layerConfig3.id), false);
+		console.log(manager._lyrs)
+		chai.assert.strictEqual(manager.isVisible(layerConfig2.id, {
+			ownStatus: true
+		}), true);
+		chai.assert.strictEqual(manager.isVisible(layerConfig3.id, {
+			ownStatus: true
+		}), false);
+	});
 });
