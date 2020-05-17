@@ -287,13 +287,13 @@ class LayerGroup {
 		if (typeof id === 'undefined') throw new Error(`id is required.`);
 		if (getIndexByKey(this._lyrs, '_id', id) >= 0) throw new Error(`${id} already exists on this manager.`);
 
-		if (typeof layerConfig.layout === 'undefined' || typeof layerConfig.layout.visibility === 'undefined')
+		const visible = typeof layerConfig.layout === 'undefined' || typeof layerConfig.layout.visibility === 'undefined' || layerConfig.layout.visibility === 'visible' ? true : false;
+		if (visible)
 			layerConfig = $.extend(true, {
 				layout: {
 					visibility: 'visible'
 				}
 			}, layerConfig)
-		const visible = layerConfig.layout.visibility === 'visible' ? true : false;
 		if (!onVisiblePath) layerConfig.layout.visibility = 'none';
 		const type = layerConfig.type;
 
@@ -430,7 +430,7 @@ class SingleLayerGroup extends LayerGroup {
 
 	_addLayer(layerConfig, options = {}) {
 		super._addLayer(layerConfig, options);
-		if (typeof layerConfig.layout === 'undefined' || layerConfig.layout.visibility === 'visible') {
+		if (typeof layerConfig.layout === 'undefined' || typeof layerConfig.layout.visibility === 'undefined' || layerConfig.layout.visibility === 'visible') {
 			this._selectId = layerConfig.id;
 			this._lyrs.forEach((otherLayer) => {
 				if (otherLayer._id !== layerConfig.id)
