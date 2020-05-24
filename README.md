@@ -323,7 +323,6 @@ manager.setOpacity("group1", 0.8);
 manager.isVisible("group1");
 ```
 
-
 ### Layerへのイベント関連付け
 `manager.on(type, id, listener)`
 
@@ -332,6 +331,12 @@ manager.isVisible("group1");
 on/offのwrapper
 
 現状ラスターレイヤーへの関連付けはできない。
+
+### ソースの取得
+`manager.getSource(id)`
+
+getSourceのwrapper
+
 
 ### mapのメソッド呼び出し
 `manager.invoke(funcName, args..)`

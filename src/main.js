@@ -559,6 +559,18 @@ class MapboxLayerManager extends LayerGroup {
 		parent._removeSource(id);
 	}
 
+	getSource(id) {
+		const parentPath = getParentPath(id, this._separator);
+		const parent = this._getById(parentPath);
+		if (typeof parent === 'undefined') throw new Error('not found parent layer group.');
+
+		return this._map.getSource(id);;
+	}
+
+	getSource(id) {
+		return this._map.getSource(id);;
+	}
+
 	show(id, options = {}) {
 		options = $.extend(true, {
 			force: false
