@@ -1318,6 +1318,104 @@ describe('others', () => {
 			.to.deep.equal([0.8, 0.1, 0.1, 0.8, 0.8, 0.8]);
 	});
 
+
+	it('has', () => {
+		const groupId1 = 'group1'
+		manager.addGroup({
+			id: groupId1
+		});
+		const layerConfig1 = dummyImageLayerConfig(groupId1 + '/image1', 'visible');
+		manager.addLayer(layerConfig1, {
+			fixedTo: 'underlay'
+		});
+
+		const layerConfig2 = dummyImageLayerConfig('image2', 'none');
+		manager.addLayer(layerConfig2);
+
+		chai.expect(manager.has(groupId1)).to.be.true;
+		chai.expect(manager.has(layerConfig1.id)).to.be.true;
+		chai.expect(manager.has(layerConfig2.id)).to.be.true;
+		chai.expect(manager.has("dummy")).to.be.false;
+
+	});
+	it('getChildIds', () => {
+		const layerConfig0 = dummyImageLayerConfig('image0', 'visible');
+		manager.addLayer(layerConfig0);
+
+		const groupId1 = 'group1'
+		manager.addGroup({
+			id: groupId1
+		});
+		const groupId2 = 'group2'
+		manager.addGroup({
+			id: groupId2
+		});
+		const layerConfig1 = dummyImageLayerConfig(groupId1 + '/image1', 'visible');
+		manager.addLayer(layerConfig1);
+
+		const layerConfig2 = dummyImageLayerConfig(groupId2 + '/image2', 'visible');
+		manager.addLayer(layerConfig2);
+		const layerConfig3 = dummyImageLayerConfig('image3', 'none');
+		manager.addLayer(layerConfig3);
+
+		const groupId3 = groupId2 + '/group3'
+		manager.addGroup({
+			id: groupId3,
+			type: 'single'
+		}, {
+			beforeId: layerConfig2.id
+		});
+		const layerConfig4 = dummyImageLayerConfig(groupId3 + '/image4', 'visible');
+		manager.addLayer(layerConfig4);
+		const groupId4 = groupId3 + '/group4'
+		manager.addGroup({
+			id: groupId4,
+			visible: false
+		});
+		const layerConfig5 = dummyImageLayerConfig(groupId4 + '/image5', 'visible');
+		manager.addLayer(layerConfig5);
+		const layerConfig6 = dummyImageLayerConfig(groupId3 + '/image6', 'visible');
+		manager.addLayer(layerConfig6, {
+			fixedTo: 'overlay'
+		});
+
+		chai.expect(manager.getChildIds())
+			.to.deep.equal([layerConfig0.id, groupId1, groupId2, layerConfig3.id]);
+		chai.expect(manager.getChildIds({
+				id: layerConfig0.id
+			}))
+			.to.deep.equal([]);
+		chai.expect(manager.getChildIds({
+				id: groupId1
+			}))
+			.to.deep.equal([layerConfig1.id]);
+		chai.expect(manager.getChildIds({
+			id: groupId3
+		})).to.deep.equal([layerConfig4.id, groupId4, layerConfig6.id]);
+
+		chai.expect(manager.getChildIds({
+				visiblity: 'visible'
+			}))
+			.to.deep.equal([layerConfig0.id, groupId1, groupId2]);
+		chai.expect(manager.getChildIds({
+				visiblity: 'none'
+			}))
+			.to.deep.equal([layerConfig3.id]);
+
+		console.log(manager.getChildIds({
+			id: groupId3,
+			visiblity: 'visible'
+		}));
+		chai.expect(manager.getChildIds({
+			id: groupId3,
+			visiblity: 'visible'
+		})).to.deep.equal([layerConfig6.id]);
+
+		chai.expect(manager.getChildIds({
+			id: groupId3,
+			visiblity: 'none'
+		})).to.deep.equal([layerConfig4.id, groupId4]);
+	});
 	it('isVisible', () => {
 		const layerConfig1 = dummyImageLayerConfig('image1', 'visible');
 		manager.addLayer(layerConfig1);

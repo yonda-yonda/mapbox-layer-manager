@@ -133,6 +133,21 @@ class LayerGroup {
 		this._separator = options.separator;
 	}
 
+	_getChildIds(options = {}) {
+		options = $.extend(true, {
+			visiblity: 'any'
+		}, options);
+		const ids = [];
+		this._lyrs.forEach((lyr) => {
+			if (options.visiblity === 'any')
+				ids.push(lyr._id)
+			else if (options.visiblity === 'visible' && lyr._visible === true)
+				ids.push(lyr._id)
+			else if (options.visiblity === 'none' && lyr._visible === false)
+				ids.push(lyr._id)
+		})
+		return ids;
+	}
 
 	_show(id, root, options = {}) {
 		options = $.extend(true, {
@@ -564,11 +579,7 @@ class MapboxLayerManager extends LayerGroup {
 		const parent = this._getById(parentPath);
 		if (typeof parent === 'undefined') throw new Error('not found parent layer group.');
 
-		return this._map.getSource(id);;
-	}
-
-	getSource(id) {
-		return this._map.getSource(id);;
+		return this._map.getSource(id);
 	}
 
 	show(id, options = {}) {
@@ -658,6 +669,10 @@ class MapboxLayerManager extends LayerGroup {
 		return this._onVisiblePath(lyr)
 	}
 
+	has(id) {
+		return typeof this._getById(id) !== 'undefined'
+	}
+
 	setOpacity(id, opacity) {
 		const lyr = this._getById(id);
 
@@ -693,6 +708,21 @@ class MapboxLayerManager extends LayerGroup {
 		const lyr = this._getById(id);
 		if (lyr instanceof LayerGroup) throw new Error('This id is not layer.');
 		this._map.off(type, id, listener)
+	}
+
+	getChildIds(options = {}) {
+		options = $.extend(true, {
+			id: '',
+			visiblity: 'any'
+		}, options);
+		const id = options.id;
+		const visiblity = options.visiblity;
+		const root = this._getById(id);
+
+		if (root instanceof Layer) return [];
+		return root._getChildIds({
+			visiblity
+		});
 	}
 
 	getLayerIds(options = {}) {
