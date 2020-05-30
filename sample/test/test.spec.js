@@ -902,13 +902,26 @@ describe('change order', () => {
 				groupId1, layerConfig1.id, layerConfig3.id,
 				groupId5, groupId6, layerConfig7.id, layerConfig8.id, groupId7, layerConfig9.id
 			]);
+		manager.move(layerConfig2.id, groupId3);
+		chai.expect(getIds(manager, 'all'))
+			.to.deep.equal([layerConfig0.id, groupId2, layerConfig2.id,
+				groupId3, layerConfig4.id,
+				groupId4, layerConfig5.id, layerConfig6.id,
+				groupId1, layerConfig1.id, layerConfig3.id,
+				groupId5, groupId6, layerConfig7.id, layerConfig8.id, groupId7, layerConfig9.id
+			]);
+		manager.move(groupId1);
+		chai.expect(getIds(manager, 'all'))
+			.to.deep.equal([layerConfig0.id, groupId2, layerConfig2.id,
+				groupId3, layerConfig4.id,
+				groupId4, layerConfig5.id, layerConfig6.id, layerConfig3.id,
+				groupId1, layerConfig1.id,
+				groupId5, groupId6, layerConfig7.id, layerConfig8.id, groupId7, layerConfig9.id
+			]);
 
 		// rise error
 		chai.expect(() => {
 			manager.move(layerConfig0.id, layerConfig3.id);
-		}).to.throw();
-		chai.expect(() => {
-			manager.move(layerConfig4.id);
 		}).to.throw();
 		chai.expect(() => {
 			manager.move(groupId6, groupId7);
@@ -1402,10 +1415,6 @@ describe('others', () => {
 			}))
 			.to.deep.equal([layerConfig3.id]);
 
-		console.log(manager.getChildIds({
-			id: groupId3,
-			visiblity: 'visible'
-		}));
 		chai.expect(manager.getChildIds({
 			id: groupId3,
 			visiblity: 'visible'

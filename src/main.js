@@ -615,16 +615,19 @@ class MapboxLayerManager extends LayerGroup {
 			return;
 
 		if (beforeId) {
-			const beforeParentPath = beforeId.slice(0, beforeId.lastIndexOf(this._separator) + 1);
+			const beforeParentPath = getParentPath(beforeId, this._separator);
 			if (parentPath !== beforeParentPath) throw new Error('These ids are not same group.');
 		}
 
-		if ([parent._underlayId, parent._overlayId].indexOf(id) >= 0)
+		if ([parent._underlayId, parent._overlayId].indexOf(id) >= 0) {
 			throw new Error('can\'t update fixed layer.');
-		if (parent._underlayId === beforeId)
+		}
+		if (parent._underlayId === beforeId) {
 			throw new Error('can\'t update fixed layer.');
-		if (parent._overlayId !== '' && typeof beforeId === 'undefined')
-			throw new Error('can\'t update fixed layer.');
+		}
+		if (parent._overlayId !== '' && typeof beforeId === 'undefined') {
+			beforeId = parent._overlayId;
+		}
 
 		const lyr = parent._lyrs[getIndexByKey(parent._lyrs, '_id', id)];
 		removeList(lyr, parent._lyrs);
