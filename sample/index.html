@@ -261,8 +261,12 @@
         data: './shape.geojson'
     });
 
+    manager.addGroup({
+        id: 'group4/shape1'
+    });
+
     manager.addLayer({
-        'id': 'group4/shape1-polygon',
+        'id': 'group4/shape1/polygon',
         'type': 'fill',
         'source': 'group4/shape1',
         'paint': {
@@ -277,7 +281,7 @@
     });
 
     manager.addLayer({
-        'id': 'group4/shape1-point',
+        'id': 'group4/shape1/point',
         'type': 'circle',
         'source': 'group4/shape1',
         'paint': {
@@ -293,7 +297,7 @@
     });
 
     manager.addLayer({
-        'id': 'group4/shape1-line',
+        'id': 'group4/shape1/line',
         'type': 'line',
         'source': 'group4/shape1',
         'layout': {

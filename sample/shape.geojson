@@ -24,9 +24,9 @@
 				"drawtype": "polygon",
 				"color": "#3388ff",
 				"weight": 4,
-				"opacity": 0.5,
+				"opacity": 1,
 				"fillColor": "#000",
-				"fillOpacity": 0.2
+				"fillOpacity": 1
 			},
 			"type": "Feature",
 			"geometry": {
@@ -70,11 +70,11 @@
 				"coordinates": [
 					[
 						139.627146,
-						35.624318
+						35.689341
 					],
 					[
 						139.743472,
-						35.620557
+						35.663382
 					]
 				]
 			}

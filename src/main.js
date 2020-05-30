@@ -353,6 +353,7 @@ class LayerGroup {
 			if (typeof beforeLayerId === 'undefined')
 				beforeLayerId = parentNextLayerId;
 		}
+
 		this._map.addLayer(layerConfig, beforeLayerId);
 
 		if (typeof layerConfig.source !== 'string') {
@@ -494,12 +495,11 @@ class MapboxLayerManager extends LayerGroup {
 		if (lyr !== this) {
 			const id = lyr._id;
 			const parent = lyr._parent;
-			let nextLayerId = getFirstLayerId(lyr._lyrs, id);
-			if (typeof nextLayerId === 'undefined') {
-				nextLayerId = getFirstLayerId(parent._lyrs, id);
-			}
-
-			return nextLayerId;
+			const parentNextId = getFirstLayerId(parent._lyrs, id)
+			if (typeof parentNextId === "undefined")
+				return this._getParentNextLayerId(parent)
+			else
+				return parentNextId
 		}
 	}
 
@@ -542,7 +542,6 @@ class MapboxLayerManager extends LayerGroup {
 		const parentPath = getParentPath(id, this._separator);
 		const parent = this._getById(parentPath);
 		if (typeof parent === 'undefined') throw new Error('not found parent layer group.');
-
 		parent._addLayer(layerConfig, $.extend(true, options, {
 			onVisiblePath: this._onVisiblePath(parent),
 			parentNextLayerId: this._getParentNextLayerId(parent)
