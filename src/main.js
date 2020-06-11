@@ -135,15 +135,15 @@ class LayerGroup {
 
 	_getChildIds(options = {}) {
 		options = $.extend(true, {
-			visiblity: 'any'
+			visibility: 'any'
 		}, options);
 		const ids = [];
 		this._lyrs.forEach((lyr) => {
-			if (options.visiblity === 'any')
+			if (options.visibility === 'any')
 				ids.push(lyr._id)
-			else if (options.visiblity === 'visible' && lyr._visible === true)
+			else if (options.visibility === 'visible' && lyr._visible === true)
 				ids.push(lyr._id)
-			else if (options.visiblity === 'none' && lyr._visible === false)
+			else if (options.visibility === 'none' && lyr._visible === false)
 				ids.push(lyr._id)
 		})
 		return ids;
@@ -715,25 +715,25 @@ class MapboxLayerManager extends LayerGroup {
 	getChildIds(options = {}) {
 		options = $.extend(true, {
 			id: '',
-			visiblity: 'any'
+			visibility: 'any'
 		}, options);
 		const id = options.id;
-		const visiblity = options.visiblity;
+		const visibility = options.visibility;
 		const root = this._getById(id);
 
 		if (root instanceof Layer) return [];
 		return root._getChildIds({
-			visiblity
+			visibility
 		});
 	}
 
 	getLayerIds(options = {}) {
 		options = $.extend(true, {
 			id: '',
-			visiblity: 'any'
+			visibility: 'any'
 		}, options);
 		const id = options.id;
-		const visiblity = options.visiblity;
+		const visibility = options.visibility;
 		const root = this._getById(id);
 
 		if (root instanceof Layer) return [root._id];
@@ -742,12 +742,12 @@ class MapboxLayerManager extends LayerGroup {
 			let ids = []
 			lyrs.forEach((lyr) => {
 				if (lyr instanceof Layer) {
-					if (visiblity === 'any' && this._map.getLayer(lyr._id))
+					if (visibility === 'any' && this._map.getLayer(lyr._id))
 						ids.push(lyr._id);
-					if (visiblity === 'visible' && this._map.getLayer(lyr._id) && this._map.getLayoutProperty(lyr._id, 'visibility') === 'visible') {
+					if (visibility === 'visible' && this._map.getLayer(lyr._id) && this._map.getLayoutProperty(lyr._id, 'visibility') === 'visible') {
 						ids.push(lyr._id);
 					}
-					if (visiblity === 'none' && this._map.getLayer(lyr._id) && this._map.getLayoutProperty(lyr._id, 'visibility') === 'none') {
+					if (visibility === 'none' && this._map.getLayer(lyr._id) && this._map.getLayoutProperty(lyr._id, 'visibility') === 'none') {
 						ids.push(lyr._id);
 					}
 				}

@@ -150,10 +150,10 @@ describe('add/remove layer', () => {
 		chai.assert.strictEqual(getIds(manager, 'layer').length, 3)
 		// actual number
 		chai.assert.strictEqual(manager.getLayerIds({
-			visiblity: 'visible'
+			visibility: 'visible'
 		}).length, 2)
 		chai.assert.strictEqual(manager.getLayerIds({
-			visiblity: 'none'
+			visibility: 'none'
 		}).length, 1)
 	});
 	it('add underlay', () => {
@@ -456,12 +456,12 @@ describe('add/remove layer', () => {
 
 		// actual layer
 		chai.expect(manager.getLayerIds({
-				visiblity: 'visible'
+				visibility: 'visible'
 			}))
 			.to.deep.equal([layerConfig1.id, layerConfig2.id, layerConfig6.id]);
 
 		chai.expect(manager.getLayerIds({
-				visiblity: 'none'
+				visibility: 'none'
 			}))
 			.to.deep.equal([layerConfig4.id, layerConfig5.id, layerConfig3.id, layerConfig7.id, layerConfig8.id, layerConfig9.id]);
 
@@ -562,11 +562,11 @@ describe('add/remove layer', () => {
 				groupId5, layerConfig7.id, layerConfig8.id, groupId6, layerConfig9.id, groupId7
 			]);
 		chai.expect(manager.getLayerIds({
-				visiblity: 'visible'
+				visibility: 'visible'
 			}))
 			.to.deep.equal([layerConfig1.id, layerConfig5.id, layerConfig6.id, layerConfig2.id, layerConfig7.id]);
 		chai.expect(manager.getLayerIds({
-				visiblity: 'any'
+				visibility: 'any'
 			}))
 			.to.deep.equal([layerConfig1.id,
 				layerConfig4.id,
@@ -576,7 +576,7 @@ describe('add/remove layer', () => {
 
 		manager.removeLayer(layerConfig6.id);
 		chai.expect(manager.getLayerIds({
-				visiblity: 'visible'
+				visibility: 'visible'
 			}))
 			.to.deep.equal([layerConfig1.id, layerConfig5.id, layerConfig2.id, layerConfig7.id]);
 		chai.expect(getIds(manager, 'all'))
@@ -586,7 +586,7 @@ describe('add/remove layer', () => {
 				groupId5, layerConfig7.id, layerConfig8.id, groupId6, layerConfig9.id, groupId7
 			]);
 		chai.expect(manager.getLayerIds({
-				visiblity: 'any'
+				visibility: 'any'
 			}))
 			.to.deep.equal([layerConfig1.id,
 				layerConfig4.id,
@@ -597,7 +597,7 @@ describe('add/remove layer', () => {
 
 		manager.removeGroup(groupId4);
 		chai.expect(manager.getLayerIds({
-				visiblity: 'visible'
+				visibility: 'visible'
 			}))
 			.to.deep.equal([layerConfig1.id, layerConfig2.id, layerConfig7.id]);
 		chai.expect(getIds(manager, 'all'))
@@ -607,7 +607,7 @@ describe('add/remove layer', () => {
 			]);
 
 		chai.expect(manager.getLayerIds({
-				visiblity: 'any'
+				visibility: 'any'
 			}))
 			.to.deep.equal([layerConfig1.id,
 				layerConfig4.id, layerConfig2.id, layerConfig3.id,
@@ -629,11 +629,11 @@ describe('add/remove layer', () => {
 				groupId3, layerConfig4.id, layerConfig2.id, layerConfig3.id
 			]);
 		chai.expect(manager.getLayerIds({
-				visiblity: 'visible'
+				visibility: 'visible'
 			}))
 			.to.deep.equal([layerConfig1.id, layerConfig2.id]);
 		chai.expect(manager.getLayerIds({
-				visiblity: 'any'
+				visibility: 'any'
 			}))
 			.to.deep.equal([layerConfig1.id,
 				layerConfig4.id, layerConfig2.id, layerConfig3.id
@@ -660,7 +660,7 @@ describe('add/remove layer', () => {
 		manager.addLayer(layerConfig2);
 
 		chai.expect(manager.getLayerIds({
-				visiblity: 'any'
+				visibility: 'any'
 			}))
 			.to.deep.equal([layerConfig1.id, layerConfig2.id]);
 		chai.expect(typeof manager._map.getLayer(layerConfig1.id)).to.not.equal('undefined');
@@ -670,7 +670,7 @@ describe('add/remove layer', () => {
 		chai.expect(typeof manager._map.getLayer(layerConfig1.id)).to.equal('undefined');
 		chai.expect(typeof manager._map.getLayer(layerConfig2.id)).to.equal('undefined');
 		chai.expect(manager.getLayerIds({
-				visiblity: 'any'
+				visibility: 'any'
 			}))
 			.to.deep.equal([]);
 	})
@@ -932,7 +932,7 @@ describe('change order', () => {
 	});
 });
 
-describe('change visiblity', () => {
+describe('change visibility', () => {
 	it('show/hide', () => {
 		const layerConfig0 = dummyImageLayerConfig('image0', 'visible');
 		manager.addLayer(layerConfig0, {
@@ -1004,7 +1004,7 @@ describe('change visiblity', () => {
 				groupId6, layerConfig7.id
 			]);
 		chai.expect(manager.getLayerIds({
-				visiblity: 'visible'
+				visibility: 'visible'
 			}))
 			.to.deep.equal([layerConfig0.id, layerConfig1.id,
 				layerConfig6.id, layerConfig2.id
@@ -1016,7 +1016,7 @@ describe('change visiblity', () => {
 				groupId6, layerConfig7.id
 			]);
 		chai.expect(manager.getLayerIds({
-				visiblity: 'visible'
+				visibility: 'visible'
 			}))
 			.to.deep.equal([layerConfig1.id,
 				layerConfig6.id, layerConfig2.id
@@ -1028,7 +1028,7 @@ describe('change visiblity', () => {
 				groupId6, layerConfig7.id
 			]);
 		chai.expect(manager.getLayerIds({
-				visiblity: 'visible'
+				visibility: 'visible'
 			}))
 			.to.deep.equal([layerConfig0.id, layerConfig1.id,
 				layerConfig6.id, layerConfig2.id
@@ -1040,7 +1040,7 @@ describe('change visiblity', () => {
 				groupId6, layerConfig7.id
 			]);
 		chai.expect(manager.getLayerIds({
-				visiblity: 'visible'
+				visibility: 'visible'
 			}))
 			.to.deep.equal([layerConfig0.id, layerConfig1.id,
 				layerConfig6.id, layerConfig2.id, layerConfig7.id
@@ -1052,7 +1052,7 @@ describe('change visiblity', () => {
 				groupId6, layerConfig7.id
 			]);
 		chai.expect(manager.getLayerIds({
-				visiblity: 'visible'
+				visibility: 'visible'
 			}))
 			.to.deep.equal([layerConfig0.id, layerConfig1.id,
 				layerConfig6.id, layerConfig2.id
@@ -1066,7 +1066,7 @@ describe('change visiblity', () => {
 				groupId6, layerConfig7.id
 			]);
 		chai.expect(manager.getLayerIds({
-				visiblity: 'visible'
+				visibility: 'visible'
 			}))
 			.to.deep.equal([layerConfig0.id, layerConfig1.id]);
 		manager.show(groupId2, {
@@ -1078,7 +1078,7 @@ describe('change visiblity', () => {
 				groupId6, layerConfig7.id
 			]);
 		chai.expect(manager.getLayerIds({
-				visiblity: 'visible'
+				visibility: 'visible'
 			}))
 			.to.deep.equal([layerConfig0.id, layerConfig1.id,
 				layerConfig6.id, layerConfig2.id
@@ -1092,7 +1092,7 @@ describe('change visiblity', () => {
 				groupId3, layerConfig6.id, layerConfig2.id
 			]);
 		chai.expect(manager.getLayerIds({
-				visiblity: 'visible'
+				visibility: 'visible'
 			}))
 			.to.deep.equal([layerConfig0.id, layerConfig1.id,
 				layerConfig6.id, layerConfig2.id
@@ -1107,7 +1107,7 @@ describe('change visiblity', () => {
 				groupId6, layerConfig7.id, layerConfig9.id, layerConfig8.id
 			]);
 		chai.expect(manager.getLayerIds({
-				visiblity: 'visible'
+				visibility: 'visible'
 			}))
 			.to.deep.equal([layerConfig0.id, layerConfig1.id,
 				layerConfig6.id, layerConfig2.id, layerConfig7.id, layerConfig9.id, layerConfig8.id
@@ -1196,7 +1196,7 @@ describe('type', () => {
 		chai.expect(getIds(manager, 'all', 'visible'))
 			.to.deep.equal([groupId1, layerConfig1.id, shapeId1, shapeId3, layerConfig2.id]);
 		chai.expect(manager.getLayerIds({
-				visiblity: 'visible'
+				visibility: 'visible'
 			}))
 			.to.deep.equal([layerConfig1.id, shapeId1, shapeId3, layerConfig2.id]);
 
@@ -1206,7 +1206,7 @@ describe('type', () => {
 		chai.expect(getIds(manager, 'all', 'visible'))
 			.to.deep.equal([groupId1, layerConfig1.id, shapeId2, shapeId3, layerConfig2.id]);
 		chai.expect(manager.getLayerIds({
-				visiblity: 'visible'
+				visibility: 'visible'
 			}))
 			.to.deep.equal([layerConfig1.id, shapeId2, shapeId3, layerConfig2.id]);
 
@@ -1407,22 +1407,22 @@ describe('others', () => {
 		})).to.deep.equal([layerConfig4.id, groupId4, layerConfig6.id]);
 
 		chai.expect(manager.getChildIds({
-				visiblity: 'visible'
+				visibility: 'visible'
 			}))
 			.to.deep.equal([layerConfig0.id, groupId1, groupId2]);
 		chai.expect(manager.getChildIds({
-				visiblity: 'none'
+				visibility: 'none'
 			}))
 			.to.deep.equal([layerConfig3.id]);
 
 		chai.expect(manager.getChildIds({
 			id: groupId3,
-			visiblity: 'visible'
+			visibility: 'visible'
 		})).to.deep.equal([layerConfig6.id]);
 
 		chai.expect(manager.getChildIds({
 			id: groupId3,
-			visiblity: 'none'
+			visibility: 'none'
 		})).to.deep.equal([layerConfig4.id, groupId4]);
 	});
 	it('isVisible', () => {
