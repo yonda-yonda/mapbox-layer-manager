@@ -730,11 +730,13 @@ class MapboxLayerManager extends LayerGroup {
 	getLayerIds(options = {}) {
 		options = $.extend(true, {
 			id: '',
-			visibility: 'any'
+			visibility: 'any',
+			type: 'layer'
 		}, options);
 		const id = options.id;
 		const visibility = options.visibility;
 		const root = this._getById(id);
+		const type = options.type;
 
 		if (root instanceof Layer) return [root._id];
 
@@ -742,16 +744,30 @@ class MapboxLayerManager extends LayerGroup {
 			let ids = []
 			lyrs.forEach((lyr) => {
 				if (lyr instanceof Layer) {
-					if (visibility === 'any' && this._map.getLayer(lyr._id))
-						ids.push(lyr._id);
-					if (visibility === 'visible' && this._map.getLayer(lyr._id) && this._map.getLayoutProperty(lyr._id, 'visibility') === 'visible') {
-						ids.push(lyr._id);
-					}
-					if (visibility === 'none' && this._map.getLayer(lyr._id) && this._map.getLayoutProperty(lyr._id, 'visibility') === 'none') {
-						ids.push(lyr._id);
+					if (type === 'layer' || type === 'any') {
+						if (visibility === 'any' && this._map.getLayer(lyr._id))
+							ids.push(lyr._id);
+						if (visibility === 'visible' && this._map.getLayer(lyr._id) && this._map.getLayoutProperty(lyr._id, 'visibility') === 'visible') {
+							ids.push(lyr._id);
+						}
+						if (visibility === 'none' && this._map.getLayer(lyr._id) && this._map.getLayoutProperty(lyr._id, 'visibility') === 'none') {
+							ids.push(lyr._id);
+						}
 					}
 				}
 				if (lyr instanceof LayerGroup) {
+					const visble = lyr._visible
+					if (type === 'group' || type === 'any') {
+						if (visibility === 'any') {
+							ids.push(lyr._id);
+						}
+						if (visibility === 'none' && (visble === false || !this._onVisiblePath(lyr._parent))) {
+							ids.push(lyr._id);
+						}
+						if (visibility === 'visible' && visble === true && this._onVisiblePath(lyr._parent)) {
+							ids.push(lyr._id);
+						}
+					}
 					ids = ids.concat(_getIds(lyr._lyrs))
 				}
 			})
